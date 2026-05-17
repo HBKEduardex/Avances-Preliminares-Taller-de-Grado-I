@@ -1,0 +1,1 @@
+/root/taller1/ros2_ws/build/kuka_resources/ament_cmake_core/kuka_resourcesConfig-version.cmake

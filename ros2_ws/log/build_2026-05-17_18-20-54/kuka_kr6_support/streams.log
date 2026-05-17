@@ -1,0 +1,71 @@
+[0.019s] Invoking command in '/root/taller1/ros2_ws/build/kuka_kr6_support': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /root/taller1/ros2_ws/src/kuka_kr6_support -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/root/taller1/ros2_ws/install/kuka_kr6_support
+[0.072s] -- The C compiler identification is GNU 11.4.0
+[0.124s] -- The CXX compiler identification is GNU 11.4.0
+[0.132s] -- Detecting C compiler ABI info
+[0.200s] -- Detecting C compiler ABI info - done
+[0.205s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.205s] -- Detecting C compile features
+[0.206s] -- Detecting C compile features - done
+[0.208s] -- Detecting CXX compiler ABI info
+[0.286s] -- Detecting CXX compiler ABI info - done
+[0.292s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.292s] -- Detecting CXX compile features
+[0.292s] -- Detecting CXX compile features - done
+[0.295s] -- Found ament_cmake: 1.3.14 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.425s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[0.480s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.565s] -- Configuring done
+[0.568s] -- Generating done
+[0.569s] -- Build files have been written to: /root/taller1/ros2_ws/build/kuka_kr6_support
+[0.576s] Invoked command in '/root/taller1/ros2_ws/build/kuka_kr6_support' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /root/taller1/ros2_ws/src/kuka_kr6_support -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/root/taller1/ros2_ws/install/kuka_kr6_support
+[0.579s] Invoking command in '/root/taller1/ros2_ws/build/kuka_kr6_support': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /root/taller1/ros2_ws/build/kuka_kr6_support -- -j12 -l12
+[0.630s] Invoked command in '/root/taller1/ros2_ws/build/kuka_kr6_support' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /root/taller1/ros2_ws/build/kuka_kr6_support -- -j12 -l12
+[0.631s] Invoking command in '/root/taller1/ros2_ws/build/kuka_kr6_support': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /root/taller1/ros2_ws/build/kuka_kr6_support
+[0.637s] -- Install configuration: ""
+[0.637s] -- Execute custom install script
+[0.638s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/urdf/kr6r700sixx.xacro
+[0.647s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/urdf/kr6r700sixx_macro.xacro
+[0.656s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/urdf/kr6r900_2.xacro
+[0.665s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/urdf/kr6r900_2_macro.xacro
+[0.674s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/urdf/kr6r900sixx.xacro
+[0.683s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/urdf/kr6r900sixx_macro.xacro
+[0.693s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6_agilus/collision/base_link.stl
+[0.702s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6_agilus/collision/link_1.stl
+[0.711s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6_agilus/collision/link_3.stl
+[0.720s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6_agilus/collision/link_5.stl
+[0.729s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6_agilus/collision/link_6.stl
+[0.739s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6_agilus/visual/base_link.dae
+[0.749s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6_agilus/visual/link_1.dae
+[0.757s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6_agilus/visual/link_3.dae
+[0.767s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6_agilus/visual/link_5.dae
+[0.777s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6_agilus/visual/link_6.dae
+[0.786s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6r700sixx/collision/link_2.stl
+[0.796s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6r700sixx/collision/link_4.stl
+[0.805s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6r700sixx/visual/link_2.dae
+[0.816s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6r700sixx/visual/link_4.dae
+[0.824s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6r900sixx/collision/link_2.stl
+[0.834s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6r900sixx/collision/link_4.stl
+[0.845s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6r900sixx/visual/link_2.dae
+[0.853s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6r900sixx/visual/link_4.dae
+[0.866s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/config/joint_names_kr6r700sixx.yaml
+[0.874s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/config/joint_names_kr6r900sixx.yaml
+[0.884s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/config/joint_names_kuka_kr6_r900_2.yaml
+[0.893s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/config/opw_kinematics_kr6r700sixx.yaml
+[0.902s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/config/opw_parameters_kr6r900_2.yaml
+[0.911s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/launch/display.launch.py
+[0.922s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/ament_index/resource_index/package_run_dependencies/kuka_kr6_support
+[0.932s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/ament_index/resource_index/parent_prefix_path/kuka_kr6_support
+[0.942s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/environment/ament_prefix_path.sh
+[0.950s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/environment/ament_prefix_path.dsv
+[0.959s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/environment/path.sh
+[0.969s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/environment/path.dsv
+[0.978s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/local_setup.bash
+[0.986s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/local_setup.sh
+[0.994s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/local_setup.zsh
+[1.002s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/local_setup.dsv
+[1.010s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/package.dsv
+[1.019s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/ament_index/resource_index/packages/kuka_kr6_support
+[1.029s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/cmake/kuka_kr6_supportConfig.cmake
+[1.038s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/cmake/kuka_kr6_supportConfig-version.cmake
+[1.047s] -- Symlinking: /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/package.xml
+[1.057s] Invoked command in '/root/taller1/ros2_ws/build/kuka_kr6_support' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /root/taller1/ros2_ws/build/kuka_kr6_support

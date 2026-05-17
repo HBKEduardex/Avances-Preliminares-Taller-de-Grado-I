@@ -1,0 +1,6 @@
+Invoking command in '/root/taller1/ros2_ws/build/kuka_resources': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /root/taller1/ros2_ws/src/kuka_resources -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/root/taller1/ros2_ws/install/kuka_resources
+Invoked command in '/root/taller1/ros2_ws/build/kuka_resources' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /root/taller1/ros2_ws/src/kuka_resources -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/root/taller1/ros2_ws/install/kuka_resources
+Invoking command in '/root/taller1/ros2_ws/build/kuka_resources': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /root/taller1/ros2_ws/build/kuka_resources -- -j12 -l12
+Invoked command in '/root/taller1/ros2_ws/build/kuka_resources' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /root/taller1/ros2_ws/build/kuka_resources -- -j12 -l12
+Invoking command in '/root/taller1/ros2_ws/build/kuka_resources': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /root/taller1/ros2_ws/build/kuka_resources
+Invoked command in '/root/taller1/ros2_ws/build/kuka_resources' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /root/taller1/ros2_ws/build/kuka_resources

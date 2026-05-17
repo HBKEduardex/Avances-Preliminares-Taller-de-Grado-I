@@ -1,0 +1,9 @@
+/root/taller1/ros2_ws/build/kuka_kr6_support/CMakeFiles/uninstall.dir
+/root/taller1/ros2_ws/build/kuka_kr6_support/CMakeFiles/kuka_kr6_support_uninstall.dir
+/root/taller1/ros2_ws/build/kuka_kr6_support/CMakeFiles/test.dir
+/root/taller1/ros2_ws/build/kuka_kr6_support/CMakeFiles/edit_cache.dir
+/root/taller1/ros2_ws/build/kuka_kr6_support/CMakeFiles/rebuild_cache.dir
+/root/taller1/ros2_ws/build/kuka_kr6_support/CMakeFiles/list_install_components.dir
+/root/taller1/ros2_ws/build/kuka_kr6_support/CMakeFiles/install.dir
+/root/taller1/ros2_ws/build/kuka_kr6_support/CMakeFiles/install/local.dir
+/root/taller1/ros2_ws/build/kuka_kr6_support/CMakeFiles/install/strip.dir

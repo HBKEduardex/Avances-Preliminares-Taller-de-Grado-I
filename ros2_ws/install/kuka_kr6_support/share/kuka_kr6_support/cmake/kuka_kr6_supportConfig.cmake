@@ -1,0 +1,1 @@
+/root/taller1/ros2_ws/build/kuka_kr6_support/ament_cmake_core/kuka_kr6_supportConfig.cmake
