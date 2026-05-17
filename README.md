@@ -20,8 +20,8 @@ Ejecuta los siguientes comandos en tu terminal local para inicializar el proyect
 chmod +x scripts/*.sh
 ./scripts/build_image.sh
 ./scripts/create_container.sh
-./scripts/start_container.sh
-./scripts/attach_container.sh
+docker start kuka_ros2_humble_container
+docker attach kuka_ros2_humble_container
 ```
 
 Una vez **dentro del contenedor**, ejecuta:
@@ -35,17 +35,36 @@ ros2 launch kuka_kr6_support display.launch.py
 ```
 
 ## Uso diario
-Si ya creaste el contenedor y compilaste previamente, puedes volver a iniciar el entorno ejecutando localmente:
+Para volver a iniciar y usar el entorno en el día a día, ejecuta:
 
 ```bash
-./scripts/start_container.sh
-./scripts/attach_container.sh
+docker start kuka_ros2_humble_container
+docker attach kuka_ros2_humble_container
 ```
 
 Y una vez **dentro del contenedor**:
 
 ```bash
 ./scripts/launch_rviz.sh
+```
+
+## Entrar y salir del contenedor
+- **Entrar:** Se utiliza `docker attach kuka_ros2_humble_container` porque el contenedor es persistente y te permite conectarte directamente a la terminal principal con la que fue creado. Esto es útil para mantener el flujo de trabajo en el mismo lugar.
+- **Salir deteniendo el contenedor:** Si escribes `exit` dentro del contenedor, este se detendrá y volverás a la terminal del host.
+- **Salir sin detener el contenedor:** Para salir y dejar el contenedor corriendo en segundo plano, presiona `Ctrl + P` y luego `Ctrl + Q`.
+
+## Detener el contenedor
+Si saliste usando `Ctrl + P` y `Ctrl + Q` y quieres detener el contenedor de forma manual desde el host:
+
+```bash
+docker stop kuka_ros2_humble_container
+```
+
+## Ver contenedores
+Para listar todos tus contenedores y verificar si el tuyo está en ejecución (Up) o detenido (Exited):
+
+```bash
+docker ps -a
 ```
 
 ## Lanzar RViz2
@@ -62,22 +81,6 @@ Si modificas archivos del paquete (por ejemplo, el `.xacro`), dentro del contene
 cd /root/taller1/ros2_ws
 source /opt/ros/humble/setup.bash
 colcon build --symlink-install
-```
-
-## Entrar al contenedor
-Para abrir una terminal interactiva dentro del contenedor en ejecución, usa:
-
-```bash
-./scripts/attach_container.sh
-```
-
-> Se recomienda `docker exec -it` (que es lo que hace este script) en lugar de `docker attach` para poder abrir múltiples pestañas sin interrumpir procesos principales.
-
-## Detener contenedor
-Para detener la ejecución del contenedor sin borrarlo:
-
-```bash
-./scripts/stop_container.sh
 ```
 
 ## Limpiar build/install/log
@@ -103,7 +106,7 @@ Deberían aparecer los siguientes tópicos:
 ## Problemas comunes
 - **Si RViz2 abre sin robot:** agregar `RobotModel` y poner `Description Topic` en `/robot_description`.
 - **Si aparece error de Fixed Frame:** cambiar `Fixed Frame` a `base_link`.
-- **Si no abre interfaz gráfica:** ejecutar `xhost +local:docker` en el host (este paso ya se incluye en `start_container.sh`).
+- **Si no abre interfaz gráfica:** ejecutar `xhost +local:docker` en el host antes de iniciar el contenedor.
 - **Si el contenedor no existe:** ejecutar `./scripts/create_container.sh`.
 - **Si se modifican dependencias del Dockerfile:** volver a ejecutar `./scripts/build_image.sh`.
 
