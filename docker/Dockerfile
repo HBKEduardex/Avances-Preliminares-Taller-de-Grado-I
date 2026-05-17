@@ -1,9 +1,8 @@
 FROM osrf/ros:humble-desktop
 
-ENV DEBIAN_FRONTEND=noninteractive
-
 RUN apt-get update && apt-get install -y \
     git \
+    bash \
     nano \
     tree \
     python3-colcon-common-extensions \
@@ -11,10 +10,5 @@ RUN apt-get update && apt-get install -y \
     ros-humble-robot-state-publisher \
     ros-humble-joint-state-publisher-gui \
     ros-humble-rviz2 \
+    ros-humble-tf2-tools \
     && rm -rf /var/lib/apt/lists/*
-
-SHELL ["/bin/bash", "-c"]
-
-WORKDIR /root/taller1
-
-CMD ["bash"]

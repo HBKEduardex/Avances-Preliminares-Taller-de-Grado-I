@@ -1,18 +1,14 @@
 import os
 
 from launch import LaunchDescription
-from launch.substitutions import Command
+from launch.substitutions import Command, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    pkg_share = FindPackageShare("kuka_kr6_support").find("kuka_kr6_support")
-
-    xacro_file = os.path.join(
-        pkg_share,
-        "urdf",
-        "kr6r900sixx.xacro"
+    xacro_file = PathJoinSubstitution(
+        [FindPackageShare("kuka_kr6_support"), "urdf", "kr6r900sixx.xacro"]
     )
 
     robot_description = {
