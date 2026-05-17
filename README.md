@@ -118,3 +118,107 @@ Deberían aparecer los siguientes tópicos:
 
 ## Nota sobre ROS2 Humble y futura integración con MoveIt2
 Este paquete de visualización es un paso preliminar. La estructura actual en Humble (usando `xacro`, `robot_state_publisher`, etc.) está lista para ser integrada a futuro con MoveIt2 para planificación de trayectorias.
+
+## MoveIt2 mínimo para KUKA KR6 R900
+- El documento del proyecto menciona MoveIt, pero en ROS2 Humble corresponde implementar MoveIt2.
+- Esta etapa solo valida planificación articular básica usando OMPL + RRTConnect.
+- No incluye mesa, gripper, cubo, entorno, tool changer ni pick and place.
+- El paquete MoveIt2 reutiliza el modelo existente de kuka_kr6_support.
+- No se duplica el URDF/XACRO.
+- La configuración está pensada como base previa para agregar después el entorno del laboratorio y pruebas de pick and place.
+
+## Uso de MoveIt2
+
+> **Nota importante sobre el estado inicial ("invalid start state"):**
+> Si al presionar *Plan* en MoveIt2 observas el error *"Skipping invalid start state (invalid state)"*, se debe a que la posición por defecto (todos los joints en 0.0) hace que partes del robot choquen entre sí o superen algún límite. 
+> **Solución:** En RViz2 ve a la pestaña *MotionPlanning* -> *Planning*, en *Select Start State* elige `<ready>` o `<home>`, y luego dale al botón *Update*. Alternativamente, usa la ventana emergente de *joint_state_publisher_gui* para mover ligeramente las articulaciones fuera del cero antes de planificar.
+
+Iniciar contenedor:
+```bash
+docker start kuka_ros2_humble_container
+```
+
+Entrar al contenedor:
+```bash
+docker attach kuka_ros2_humble_container
+```
+
+Dentro del contenedor:
+```bash
+cd /root/taller1/ros2_ws
+source /opt/ros/humble/setup.bash
+colcon build --symlink-install
+source install/setup.bash
+ros2 launch kuka_kr6_moveit_config demo.launch.py
+```
+
+Ejemplo con argumentos:
+```bash
+ros2 launch kuka_kr6_moveit_config demo.launch.py use_rviz:=true use_gui:=true use_sim_time:=false fixed_frame:=base_link planning_group:=manipulator robot_model:=kr6r900sixx
+```
+
+Verificar tópicos:
+```bash
+ros2 topic list
+```
+
+Inspeccionar parámetros:
+```bash
+ros2 param list
+ros2 param list /move_group
+ros2 param list /robot_state_publisher
+```
+
+Mencionar que también se puede usar rqt para inspección y ajustes visuales o de parámetros:
+```bash
+rqt
+```
+
+## Parámetros configurables del launch
+- `use_rviz`: abre o no RViz2.
+- `use_gui`: abre o no joint_state_publisher_gui.
+- `use_sim_time`: activa o desactiva tiempo simulado.
+- `fixed_frame`: frame base usado para visualización.
+- `planning_group`: grupo de planificación usado por MoveIt2.
+- `robot_model`: variante del modelo del robot.
+- `rviz_config`: archivo RViz usado, si aplica.
+
+## Abrir otra terminal dentro del mismo contenedor
+NO se debe usar `docker attach` en dos terminales al mismo tiempo, porque `docker attach` se conecta a la misma sesión principal del contenedor y por eso lo que se escribe o se ve en una terminal puede reflejarse en la otra.
+
+Para abrir una segunda terminal independiente dentro del mismo contenedor, usar:
+
+```bash
+docker exec -it kuka_ros2_humble_container bash
+```
+
+Dentro de esa nueva terminal ejecutar:
+
+```bash
+cd /root/taller1/ros2_ws
+source /opt/ros/humble/setup.bash
+source install/setup.bash
+```
+
+Ejemplos de uso para monitorear tópicos:
+
+```bash
+ros2 topic list
+ros2 node list
+ros2 topic echo /joint_states
+ros2 topic echo /tf --once
+```
+
+**Debe quedar claro:**
+- `docker attach kuka_ros2_humble_container` entra a la sesión principal del contenedor.
+- `docker exec -it kuka_ros2_humble_container bash` abre una terminal nueva e independiente dentro del mismo contenedor.
+- Si se necesita lanzar RViz en una terminal y revisar tópicos en otra, usar `docker exec`, no `docker attach`.
+- Para salir de una terminal abierta con `docker exec`, se puede usar `exit` sin apagar el contenedor.
+- Para salir de `docker attach` sin detener el contenedor, usar `Ctrl + P` y luego `Ctrl + Q`.
+## Flujo de avances
+1. Visualización del KUKA en ROS2/RViz2.
+2. MoveIt2 mínimo solo con el robot.
+3. Entorno preliminar del laboratorio.
+4. Cubo de 30 mm y gripper preliminar.
+5. Prueba mínima de pick and place.
+6. Futuro: comparación KRL vs MoveIt/MoveIt2 y métricas de desempeño.

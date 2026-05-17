@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot name="kuka_kr6r900sixx">
+    <group name="manipulator">
+        <joint name="joint_a1"/>
+        <joint name="joint_a2"/>
+        <joint name="joint_a3"/>
+        <joint name="joint_a4"/>
+        <joint name="joint_a5"/>
+        <joint name="joint_a6"/>
+    </group>
+    <!-- Virtual joint -->
+    <virtual_joint name="virtual_joint" type="fixed" parent_frame="world" child_link="base_link"/>
+    <!-- Predefined group states -->
+    <group_state name="home" group="manipulator">
+        <joint name="joint_a1" value="0.0"/>
+        <joint name="joint_a2" value="-1.57"/>
+        <joint name="joint_a3" value="1.57"/>
+        <joint name="joint_a4" value="0.0"/>
+        <joint name="joint_a5" value="1.57"/>
+        <joint name="joint_a6" value="0.0"/>
+    </group_state>
+    <group_state name="ready" group="manipulator">
+        <joint name="joint_a1" value="0.0"/>
+        <joint name="joint_a2" value="-0.5"/>
+        <joint name="joint_a3" value="0.8"/>
+        <joint name="joint_a4" value="0.0"/>
+        <joint name="joint_a5" value="0.5"/>
+        <joint name="joint_a6" value="0.0"/>
+    </group_state>
+
+    <!-- Disable collisions -->
+    <disable_collisions link1="base_link" link2="link_1" reason="Adjacent"/>
+    <disable_collisions link1="link_1" link2="link_2" reason="Adjacent"/>
+    <disable_collisions link1="link_2" link2="link_3" reason="Adjacent"/>
+    <disable_collisions link1="link_3" link2="link_4" reason="Adjacent"/>
+    <disable_collisions link1="link_4" link2="link_5" reason="Adjacent"/>
+    <disable_collisions link1="link_5" link2="link_6" reason="Adjacent"/>
+    <disable_collisions link1="link_3" link2="link_5" reason="Never"/>
+    <disable_collisions link1="link_3" link2="link_6" reason="Never"/>
+</robot>
