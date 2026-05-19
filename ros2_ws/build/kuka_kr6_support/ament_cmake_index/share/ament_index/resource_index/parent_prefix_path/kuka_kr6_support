@@ -1,1 +1,1 @@
-/opt/ros/humble:/root/taller1/ros2_ws/install/kuka_resources:/root/taller1/ros2_ws/install/kuka_kr6_moveit_config:/root/taller1/ros2_ws/install/kuka_kr6_support
+/root/taller1/ros2_ws/install/kuka_pick_place_demo:/root/taller1/ros2_ws/install/kuka_pick_place_interfaces:/opt/ros/humble:/root/taller1/ros2_ws/install/kuka_resources:/root/taller1/ros2_ws/install/kuka_kr6_moveit_config:/root/taller1/ros2_ws/install/kuka_kr6_support
