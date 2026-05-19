@@ -2,9 +2,10 @@ import os
 import yaml
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Command
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 from ament_index_python.packages import get_package_share_directory
 
@@ -24,6 +25,9 @@ def generate_launch_description():
     )
     use_gui_arg = DeclareLaunchArgument(
         "use_gui", default_value="true", description="Open joint_state_publisher_gui"
+    )
+    use_fake_hardware_arg = DeclareLaunchArgument(
+        "use_fake_hardware", default_value="false", description="Use fake hardware"
     )
     use_sim_time_arg = DeclareLaunchArgument(
         "use_sim_time", default_value="false", description="Use simulation time"
@@ -52,7 +56,9 @@ def generate_launch_description():
         "urdf",
         "kr6r900sixx.xacro"
     ])
-    robot_description_content = Command(["xacro ", xacro_file])
+    robot_description_content = ParameterValue(
+        Command(["xacro ", xacro_file]), value_type=str
+    )
     robot_description = {"robot_description": robot_description_content}
 
     # Semantic description (SRDF)
@@ -61,7 +67,9 @@ def generate_launch_description():
         "config",
         "kuka_kr6.srdf"
     ])
-    robot_description_semantic_content = Command(["cat ", srdf_file])
+    robot_description_semantic_content = ParameterValue(
+        Command(["cat ", srdf_file]), value_type=str
+    )
     robot_description_semantic = {"robot_description_semantic": robot_description_semantic_content}
 
     # Kinematics
@@ -116,11 +124,39 @@ def generate_launch_description():
         parameters=[robot_description, {"use_sim_time": use_sim_time}],
     )
 
+    # Initial joint positions for joint_state_publisher_gui
+    initial_joint_positions = {
+        "joint_a1": 0.080,
+        "joint_a2": -1.609,
+        "joint_a3": 1.603,
+        "joint_a4": 0.0,
+        "joint_a5": 0.0,
+        "joint_a6": 0.0,
+    }
+
     joint_state_publisher_gui_node = Node(
         package="joint_state_publisher_gui",
         executable="joint_state_publisher_gui",
+        name="joint_state_publisher_gui",
         output="screen",
+        parameters=[{
+            "zeros": initial_joint_positions,
+            "use_sim_time": use_sim_time,
+        }],
         condition=IfCondition(LaunchConfiguration("use_gui")),
+    )
+
+    joint_state_publisher_node = Node(
+        package="joint_state_publisher",
+        executable="joint_state_publisher",
+        name="joint_state_publisher",
+        output="screen",
+        parameters=[{
+            "zeros": initial_joint_positions,
+            "use_sim_time": use_sim_time,
+            "source_list": ["/fake_joint_states"],
+        }],
+        condition=UnlessCondition(LaunchConfiguration("use_gui")),
     )
 
     rviz_node = Node(
@@ -141,6 +177,7 @@ def generate_launch_description():
     return LaunchDescription([
         use_rviz_arg,
         use_gui_arg,
+        use_fake_hardware_arg,
         use_sim_time_arg,
         fixed_frame_arg,
         planning_group_arg,
@@ -148,6 +185,7 @@ def generate_launch_description():
         rviz_config_arg,
         robot_state_publisher_node,
         joint_state_publisher_gui_node,
+        joint_state_publisher_node,
         move_group_node,
         rviz_node,
     ])

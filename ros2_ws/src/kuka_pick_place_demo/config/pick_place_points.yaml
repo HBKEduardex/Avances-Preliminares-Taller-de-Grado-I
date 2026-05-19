@@ -1,0 +1,64 @@
+sequence:
+- name: home
+  type: joint_state
+  joints:
+    joint_a1: 0.079517
+    joint_a2: -1.609071
+    joint_a3: 1.602736
+    joint_a4: 0.0
+    joint_a5: 0.0
+    joint_a6: 0.0
+- name: approach_pick
+  type: joint_state
+  joints:
+    joint_a1: -0.337058
+    joint_a2: -0.788767
+    joint_a3: 1.029982
+    joint_a4: 0.087179
+    joint_a5: 1.324495
+    joint_a6: 0.0
+- name: pick
+  type: joint_state
+  joints:
+    joint_a1: -0.337058
+    joint_a2: -0.589022
+    joint_a3: 1.056476
+    joint_a4: 0.052308
+    joint_a5: 1.12092
+    joint_a6: -0.09896
+- name: lift
+  type: joint_state
+  joints:
+    joint_a1: -0.337058
+    joint_a2: -0.965952
+    joint_a3: 1.134513
+    joint_a4: 0.052308
+    joint_a5: 1.437593
+    joint_a6: -0.09896
+- name: approach_place
+  type: joint_state
+  joints:
+    joint_a1: 0.561368
+    joint_a2: -0.722322
+    joint_a3: 1.134513
+    joint_a4: 0.052308
+    joint_a5: 1.14354
+    joint_a6: -0.09896
+- name: place
+  type: joint_state
+  joints:
+    joint_a1: 0.561368
+    joint_a2: -0.611171
+    joint_a3: 1.082488
+    joint_a4: 0.122051
+    joint_a5: 1.166159
+    joint_a6: -0.09896
+- name: retreat
+  type: joint_state
+  joints:
+    joint_a1: 0.561368
+    joint_a2: -1.209993
+    joint_a3: 1.082488
+    joint_a4: 0.122051
+    joint_a5: 1.166159
+    joint_a6: -0.09896
