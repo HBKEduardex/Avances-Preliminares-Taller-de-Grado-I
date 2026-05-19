@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <!-- ============================================================ -->
+  <!--  Environment elements for KUKA KR6 R900 workcell             -->
+  <!--  Include this file from the top-level robot xacro.            -->
+  <!--  All positions/orientations are adjustable via xacro props.   -->
+  <!-- ============================================================ -->
+
+  <!-- ── KUKA robot position in world ──────────────────────────────── -->
+  <xacro:property name="kuka_x"       default="0"/>
+  <xacro:property name="kuka_y"       default="0"/>
+  <xacro:property name="kuka_z"       default="0.5"/>
+  <xacro:property name="kuka_R"       default="0"/>
+  <xacro:property name="kuka_P"       default="0"/>
+  <xacro:property name="kuka_Y"       default="0"/>
+
+  <!-- ── Pedestal / base position ────────────────────────────────── -->
+  <xacro:property name="base_env_x"   default="-0.35"/>
+  <xacro:property name="base_env_y"   default="0.31"/>
+  <xacro:property name="base_env_z"   default="-0.53"/>
+  <xacro:property name="base_env_R"   default="1.57"/>
+  <xacro:property name="base_env_P"   default="0"/>
+  <xacro:property name="base_env_Y"   default="0"/>
+
+  <!-- ── Mesa position ───────────────────────────────────────────── -->
+  <xacro:property name="mesa_x"       default="0.25"/>
+  <xacro:property name="mesa_y"       default="-0.75"/>
+  <xacro:property name="mesa_z"       default="-0.53"/>
+  <xacro:property name="mesa_R"       default="1.57"/>
+  <xacro:property name="mesa_P"       default="0"/>
+  <xacro:property name="mesa_Y"       default="1.57"/>
+
+  <!-- ── Gripper position (relative to flange) ───────────────────── -->
+  <xacro:property name="gripper_x"    default="0"/>
+  <xacro:property name="gripper_y"    default="0"/>
+  <xacro:property name="gripper_z"    default="0"/>
+  <xacro:property name="gripper_R"    default="0"/>
+  <xacro:property name="gripper_P"    default="1.57"/>
+  <xacro:property name="gripper_Y"    default="0"/>
+
+  <!-- ── Cubo position (relative to gripper) ─────────────────────── -->
+  <xacro:property name="cubo_x"       default="-0.02"/>
+  <xacro:property name="cubo_y"       default="-0.015"/>
+  <xacro:property name="cubo_z"       default="0.02"/>
+  <xacro:property name="cubo_R"       default="0"/>
+  <xacro:property name="cubo_P"       default="0"/>
+  <xacro:property name="cubo_Y"       default="0"/>
+
+  <!-- ── Robot vertical offset (raises KUKA relative to env) ───── -->
+  <!-- Increase to raise the robot above the pedestal/mesa          -->
+  <xacro:property name="robot_z_offset" default="0"/>
+
+  <!-- ── Material for environment objects ────────────────────────── -->
+  <material name="env_gray">
+    <color rgba="0.6 0.6 0.6 1.0"/>
+  </material>
+  <material name="env_dark">
+    <color rgba="0.25 0.25 0.25 1.0"/>
+  </material>
+  <material name="env_blue">
+    <color rgba="0.2 0.4 0.8 1.0"/>
+  </material>
+
+  <!-- ============================================================ -->
+  <!--  0. world link – KUKA robot position in world frame           -->
+  <!--     Allows positioning the entire robot (e.g. on the pedestal)-->
+  <!-- ============================================================ -->
+  <link name="world"/>
+
+  <joint name="world_to_base_link" type="fixed">
+    <origin xyz="${kuka_x} ${kuka_y} ${kuka_z}"
+            rpy="${kuka_R} ${kuka_P} ${kuka_Y}"/>
+    <parent link="world"/>
+    <child  link="base_link"/>
+  </joint>
+
+  <!-- ============================================================ -->
+  <!--  1. base_env_link – pedestal / base soporte del KUKA          -->
+  <!-- ============================================================ -->
+  <link name="base_env_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_support/meshes/environment/base.stl" scale="1 1 1"/>
+      </geometry>
+      <material name="env_dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_support/meshes/environment/base.stl" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="base_env_joint" type="fixed">
+    <origin xyz="${base_env_x} ${base_env_y} ${base_env_z - robot_z_offset}"
+            rpy="${base_env_R} ${base_env_P} ${base_env_Y}"/>
+    <parent link="base_link"/>
+    <child  link="base_env_link"/>
+  </joint>
+
+  <!-- ============================================================ -->
+  <!--  2. mesa_env_link – mesa de trabajo frente al robot           -->
+  <!-- ============================================================ -->
+  <link name="mesa_env_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_support/meshes/environment/mesa.stl" scale="1 1 1"/>
+      </geometry>
+      <material name="env_gray"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_support/meshes/environment/mesa.stl" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="mesa_env_joint" type="fixed">
+    <origin xyz="${mesa_x} ${mesa_y} ${mesa_z - robot_z_offset}"
+            rpy="${mesa_R} ${mesa_P} ${mesa_Y}"/>
+    <parent link="base_link"/>
+    <child  link="mesa_env_link"/>
+  </joint>
+
+  <!-- ============================================================ -->
+  <!--  3. gripper_env_link – gripper fijo al flange del robot       -->
+  <!-- ============================================================ -->
+  <link name="gripper_env_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_support/meshes/environment/gripper.stl" scale="1 1 1"/>
+      </geometry>
+      <material name="env_dark"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_support/meshes/environment/gripper.stl" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="gripper_env_joint" type="fixed">
+    <origin xyz="${gripper_x} ${gripper_y} ${gripper_z}"
+            rpy="${gripper_R} ${gripper_P} ${gripper_Y}"/>
+    <parent link="flange"/>
+    <child  link="gripper_env_link"/>
+  </joint>
+
+  <!-- ============================================================ -->
+  <!--  4. cubo_env_link – cubo sujetado por el gripper              -->
+  <!-- ============================================================ -->
+  <link name="cubo_env_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_support/meshes/environment/cubo.stl" scale="1 1 1"/>
+      </geometry>
+      <material name="env_blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_support/meshes/environment/cubo.stl" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="cubo_env_joint" type="fixed">
+    <origin xyz="${cubo_x} ${cubo_y} ${cubo_z}"
+            rpy="${cubo_R} ${cubo_P} ${cubo_Y}"/>
+    <parent link="gripper_env_link"/>
+    <child  link="cubo_env_link"/>
+  </joint>
+
+</robot>

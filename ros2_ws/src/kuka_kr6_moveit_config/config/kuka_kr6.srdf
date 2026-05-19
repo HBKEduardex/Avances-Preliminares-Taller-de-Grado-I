@@ -8,8 +8,8 @@
         <joint name="joint_a5"/>
         <joint name="joint_a6"/>
     </group>
-    <!-- Virtual joint -->
-    <virtual_joint name="virtual_joint" type="fixed" parent_frame="world" child_link="base_link"/>
+    <!-- Virtual joint removed: world→base_link is now a real joint in environment.xacro -->
+    <!-- <virtual_joint name="virtual_joint" type="fixed" parent_frame="world" child_link="base_link"/> -->
     <!-- Predefined group states -->
     <group_state name="home" group="manipulator">
         <joint name="joint_a1" value="0.0"/>
@@ -37,4 +37,15 @@
     <disable_collisions link1="link_5" link2="link_6" reason="Adjacent"/>
     <disable_collisions link1="link_3" link2="link_5" reason="Never"/>
     <disable_collisions link1="link_3" link2="link_6" reason="Never"/>
+
+    <!-- Environment: disable self-collisions between env links -->
+    <disable_collisions link1="base_env_link" link2="mesa_env_link" reason="Never"/>
+    <disable_collisions link1="base_env_link" link2="base_link" reason="Adjacent"/>
+    <disable_collisions link1="mesa_env_link" link2="base_link" reason="Adjacent"/>
+    <disable_collisions link1="gripper_env_link" link2="link_6" reason="Adjacent"/>
+    <disable_collisions link1="gripper_env_link" link2="cubo_env_link" reason="Adjacent"/>
+    <disable_collisions link1="gripper_env_link" link2="link_5" reason="Never"/>
+    <disable_collisions link1="cubo_env_link" link2="link_6" reason="Never"/>
+    <disable_collisions link1="cubo_env_link" link2="link_5" reason="Never"/>
+    <disable_collisions link1="base_env_link" link2="link_1" reason="Never"/>
 </robot>

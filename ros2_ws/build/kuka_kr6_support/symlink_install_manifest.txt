@@ -1,9 +1,15 @@
+/root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/urdf/environment.xacro
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/urdf/kr6r700sixx.xacro
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/urdf/kr6r700sixx_macro.xacro
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/urdf/kr6r900_2.xacro
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/urdf/kr6r900_2_macro.xacro
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/urdf/kr6r900sixx.xacro
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/urdf/kr6r900sixx_macro.xacro
+/root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/environment/.gitkeep
+/root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/environment/base.stl
+/root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/environment/cubo.stl
+/root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/environment/gripper.stl
+/root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/environment/mesa.stl
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6_agilus/collision/base_link.stl
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6_agilus/collision/link_1.stl
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6_agilus/collision/link_3.stl
@@ -22,6 +28,7 @@
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6r900sixx/collision/link_4.stl
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6r900sixx/visual/link_2.dae
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/meshes/kr6r900sixx/visual/link_4.dae
+/root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/config/environment_poses.yaml
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/config/joint_names_kr6r700sixx.yaml
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/config/joint_names_kr6r900sixx.yaml
 /root/taller1/ros2_ws/install/kuka_kr6_support/share/kuka_kr6_support/config/joint_names_kuka_kr6_r900_2.yaml

@@ -29,7 +29,7 @@ def generate_launch_description():
         "use_sim_time", default_value="false", description="Use simulation time"
     )
     fixed_frame_arg = DeclareLaunchArgument(
-        "fixed_frame", default_value="base_link", description="RViz fixed frame"
+        "fixed_frame", default_value="world", description="RViz fixed frame"
     )
     planning_group_arg = DeclareLaunchArgument(
         "planning_group", default_value="manipulator", description="MoveIt planning group"

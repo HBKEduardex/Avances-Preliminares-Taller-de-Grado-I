@@ -14,6 +14,14 @@ def generate_launch_description():
     robot_description = {
         "robot_description": Command(["xacro ", xacro_file])
     }
+    initial_joint_positions = {
+        "joint_a1": 0.080,
+        "joint_a2": -1.609,
+        "joint_a3": 1.603,
+        "joint_a4": 0.0,
+        "joint_a5": 0.0,
+        "joint_a6": 0.0,
+    }
 
     robot_state_publisher_node = Node(
         package="robot_state_publisher",
@@ -27,7 +35,10 @@ def generate_launch_description():
         package="joint_state_publisher_gui",
         executable="joint_state_publisher_gui",
         name="joint_state_publisher_gui",
-        output="screen"
+        output="screen",
+        parameters=[{
+            "zeros": initial_joint_positions
+        }]
     )
 
     rviz_node = Node(
