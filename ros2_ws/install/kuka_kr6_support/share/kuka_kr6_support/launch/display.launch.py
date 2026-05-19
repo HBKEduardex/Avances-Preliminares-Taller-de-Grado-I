@@ -1,1 +1,0 @@
-/root/taller1/ros2_ws/src/kuka_kr6_support/launch/display.launch.py
