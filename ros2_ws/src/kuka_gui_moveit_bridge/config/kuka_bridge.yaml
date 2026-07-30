@@ -1,0 +1,83 @@
+kuka_moveit_bridge_node:
+  ros__parameters:
+
+    # ── Grupo MoveIt y frames ──────────────────────────────────────────
+    planning_group: manipulator
+    base_frame: base_link
+    end_effector_link: link_6
+    move_action_name: /move_action
+
+    # ── Tópicos de entrada (GUI → Bridge) ─────────────────────────────
+    # Todos los ángulos de entrada están en GRADOS (nunca radianes).
+    joint_command_topic: /kuka_bridge/joint_command_deg
+    cartesian_command_topic: /kuka_bridge/cartesian_command_deg
+
+    # ── Tópicos de salida (Bridge → GUI) ──────────────────────────────
+    status_topic: /kuka_bridge/status
+    joint_state_input_topic: /joint_states
+    joint_state_degrees_topic: /kuka_bridge/joint_state_deg
+
+    # Estado cartesiano publicado desde TF (base_link → link_6)
+    # A, B, C en GRADOS. A=B=C=0 es la identidad, NO la orientación actual.
+    cartesian_state_degrees_topic: /kuka_bridge/cartesian_state_deg
+    cartesian_state_publish_rate_hz: 10.0
+
+    # ── Planificación MoveIt ───────────────────────────────────────────
+    planning_time: 10.0
+    planning_attempts: 10
+    velocity_scaling: 0.1
+    acceleration_scaling: 0.1
+
+    # ── Tolerancias para MoveIt (en GRADOS, conversión interna a rad) ──
+    # El nodo convierte a radianes antes de enviar a MoveIt.
+    position_tolerance_m: 0.002
+    orientation_tolerance_deg: 1.0
+    joint_tolerance_deg: 0.2
+
+    # ── Tolerancias ALREADY_AT_TARGET ─────────────────────────────────
+    # Si el robot ya está en el objetivo dentro de estas tolerancias,
+    # se publica ALREADY_AT_TARGET y NO se envía goal a MoveIt.
+    # Comparación articular interna en radianes, log en grados.
+    # Comparación cartesiana: distancia euclidiana + distancia angular quaternion.
+    already_at_target_joint_tolerance_deg: 0.2
+    already_at_target_position_tolerance_m: 0.002
+    already_at_target_orientation_tolerance_deg: 1.0
+
+    # ── Staleness de joint_states ──────────────────────────────────────
+    # Si el último /joint_states es más antiguo que este valor,
+    # se rechaza el movimiento con ROBOT_STATE_STALE.
+    maximum_joint_state_age_sec: 1.0
+
+    # ── Servicio /compute_ik ───────────────────────────────────────────
+    # Usado para comandos cartesianos. La semilla de IK es el estado actual.
+    # Ventaja: favorece la solución más cercana al estado actual.
+    compute_ik_service: /compute_ik
+    ik_timeout_sec: 2.0
+    avoid_collisions: true
+
+    # ── Modo de operación ──────────────────────────────────────────────
+    # false = planificar Y ejecutar (requiere fake_trajectory_controller)
+    # true  = solo planificar (no mueve el robot, útil para validación)
+    plan_only: false
+
+    # ── Control de concurrencia ────────────────────────────────────────
+    # true  = rechazar nuevos comandos mientras hay un objetivo activo (BUSY)
+    reject_commands_while_busy: true
+
+    # ── Nombres reales de los joints (URDF kr6r900sixx_macro.xacro) ────
+    # Orden fijo: A1, A2, A3, A4, A5, A6
+    joint_names:
+      - joint_a1
+      - joint_a2
+      - joint_a3
+      - joint_a4
+      - joint_a5
+      - joint_a6
+
+    # ── Límites articulares reales del URDF (referencia, en GRADOS) ────
+    # joint_a1: [-170.0, +170.0] deg
+    # joint_a2: [-190.0,  +45.0] deg
+    # joint_a3: [-120.0, +156.0] deg
+    # joint_a4: [-185.0, +185.0] deg
+    # joint_a5: [-120.0, +120.0] deg
+    # joint_a6: [-350.0, +350.0] deg

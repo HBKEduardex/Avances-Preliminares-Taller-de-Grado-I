@@ -1,0 +1,64 @@
+kuka_bridge_test_gui_node:
+  ros__parameters:
+
+    # ── Tópicos que usa la GUI ─────────────────────────────────────────
+    # Deben coincidir exactamente con los del bridge.
+    # La GUI externa futura usará los mismos tópicos.
+    joint_command_topic: /kuka_bridge/joint_command_deg
+    cartesian_command_topic: /kuka_bridge/cartesian_command_deg
+    status_topic: /kuka_bridge/status
+    joint_state_topic: /kuka_bridge/joint_state_deg
+    cartesian_state_topic: /kuka_bridge/cartesian_state_deg
+
+    # Nodo del bridge para set_parameters (plan_only)
+    bridge_node_name: /kuka_moveit_bridge_node
+
+    # ── Pasos incrementales ────────────────────────────────────────────
+    linear_step_m: 0.01
+    cartesian_angular_step_deg: 1.0
+    joint_step_deg: 1.0
+
+    # ── Auto-copia del estado inicial ──────────────────────────────────
+    # true = copiar el primer estado recibido a los campos objetivo (UNA vez).
+    # false = dejar los campos en blanco hasta que el usuario actúe.
+    # NO envía ningún comando automáticamente.
+    auto_copy_first_joint_state: true
+    auto_copy_first_cartesian_state: true
+
+    # ── Posiciones predefinidas (en GRADOS) ───────────────────────────
+    # CARGAR HOME y CARGAR READY solo escriben en los campos objetivo.
+    # No envían comandos automáticamente.
+    # Verificados contra los límites reales del URDF.
+    home_joint_deg:
+      - 0.0      # A1  (límite: ±170°)
+      - -90.0    # A2  (límite: -190°/+45°) — validado OK
+      - 90.0     # A3  (límite: -120°/+156°) — validado OK
+      - 0.0      # A4  (límite: ±185°)
+      - 0.0      # A5  (límite: ±120°)
+      - 0.0      # A6  (límite: ±350°)
+
+    ready_joint_deg:
+      - 0.0      # A1
+      - -28.6    # A2  — validado OK
+      - 45.8     # A3  — validado OK
+      - 0.0      # A4
+      - 28.6     # A5  — validado OK
+      - 0.0      # A6
+
+    # ── Límites articulares para validación en la GUI (GRADOS) ────────
+    # Fuente: kuka_kr6_support/urdf/kr6r900sixx_macro.xacro
+    joint_min_deg:
+      - -170.0   # A1
+      - -190.0   # A2
+      - -120.0   # A3
+      - -185.0   # A4
+      - -120.0   # A5
+      - -350.0   # A6
+
+    joint_max_deg:
+      -  170.0   # A1
+      -   45.0   # A2
+      -  156.0   # A3
+      -  185.0   # A4
+      -  120.0   # A5
+      -  350.0   # A6
