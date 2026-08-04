@@ -26,7 +26,7 @@ def generate_launch_description():
     # Argumento para habilitar o deshabilitar la GUI interna de pruebas
     use_test_gui_arg = DeclareLaunchArgument(
         'use_test_gui',
-        default_value='true',
+        default_value='false',
         description='Inicia la GUI interna de pruebas (Tkinter)'
     )
 
