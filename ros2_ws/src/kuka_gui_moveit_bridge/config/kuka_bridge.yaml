@@ -4,7 +4,7 @@ kuka_moveit_bridge_node:
     # ── Grupo MoveIt y frames ──────────────────────────────────────────
     planning_group: manipulator
     base_frame: base_link
-    end_effector_link: link_6
+    end_effector_link: tool0
     move_action_name: /move_action
 
     # ── Tópicos de entrada (GUI → Bridge) ─────────────────────────────
@@ -17,7 +17,7 @@ kuka_moveit_bridge_node:
     joint_state_input_topic: /joint_states
     joint_state_degrees_topic: /kuka_bridge/joint_state_deg
 
-    # Estado cartesiano publicado desde TF (base_link → link_6)
+    # Estado cartesiano publicado desde TF (base_link → tool0)
     # A, B, C en GRADOS. A=B=C=0 es la identidad, NO la orientación actual.
     cartesian_state_degrees_topic: /kuka_bridge/cartesian_state_deg
     cartesian_state_publish_rate_hz: 10.0

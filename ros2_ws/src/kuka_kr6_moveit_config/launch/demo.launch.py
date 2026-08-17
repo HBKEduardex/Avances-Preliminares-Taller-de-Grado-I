@@ -126,11 +126,11 @@ def generate_launch_description():
 
     # Initial joint positions for joint_state_publisher_gui
     initial_joint_positions = {
-        "joint_a1": 0.080,
-        "joint_a2": -1.609,
-        "joint_a3": 1.603,
+        "joint_a1": 0.0,
+        "joint_a2": -1.5708,
+        "joint_a3": 1.5708,
         "joint_a4": 0.0,
-        "joint_a5": 0.0,
+        "joint_a5": 1.5708,
         "joint_a6": 0.0,
     }
 
