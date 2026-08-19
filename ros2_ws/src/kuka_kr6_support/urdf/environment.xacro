@@ -132,14 +132,22 @@
   <!-- ============================================================ -->
   <link name="gripper_env_link">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <!-- Ajuste SOLO de la malla (el frame del link NO se mueve):
+           eje longitudinal del STL (+X mesh) alineado con +Z del link,
+           eje del collar trasero (Y=39.04mm, Z=19.2mm del STL) sobre el eje del flange,
+           cara ESTRUCTURAL de la placa base (x=8.858mm del STL) al ras del flange.
+           El collar y los pasadores (x<8.858mm) quedan alojados dentro del
+           cilindro del flange (r=18.2mm < 20mm, 8.8mm < 13.5mm de largo). -->
+      <origin xyz="0.0192 -0.03904 -0.008858" rpy="0 -1.5708 0"/>
       <geometry>
         <mesh filename="package://kuka_kr6_support/meshes/environment/gripper.stl" scale="1 1 1"/>
       </geometry>
       <material name="env_dark"/>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <!-- Volumen fisico del gripper para MoveIt2: misma malla y EXACTAMENTE la
+           misma transformacion que <visual>, para que collision y visual coincidan. -->
+      <origin xyz="0.0192 -0.03904 -0.008858" rpy="0 -1.5708 0"/>
       <geometry>
         <mesh filename="package://kuka_kr6_support/meshes/environment/gripper.stl" scale="1 1 1"/>
       </geometry>
@@ -158,7 +166,10 @@
   <!-- ============================================================ -->
   <link name="cubo_env_link">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <!-- Ajuste SOLO visual: centra el cubo (30mm) entre las mordazas, sobre el eje
+           del gripper y a 118mm del flange (zona de agarre; puntas a 144mm).
+           Compensa el offset del cubo_env_joint, que NO se toca. -->
+      <origin xyz="0.005 0 0.083" rpy="0 0 0"/>
       <geometry>
         <mesh filename="package://kuka_kr6_support/meshes/environment/cubo.stl" scale="1 1 1"/>
       </geometry>

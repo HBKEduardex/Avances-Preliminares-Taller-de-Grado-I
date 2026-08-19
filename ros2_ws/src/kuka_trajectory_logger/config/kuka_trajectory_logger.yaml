@@ -1,0 +1,45 @@
+kuka_trajectory_logger_node:
+  ros__parameters:
+
+    # ── Fuente de datos ────────────────────────────────────────────────
+    # Topico donde el planning pipeline de move_group publica CADA plan
+    # resuelto con exito.
+    #   Tipo: moveit_msgs/msg/DisplayTrajectory
+    #   Publicador: move_group (planning_pipeline, display_planned_path)
+    # Normalmente no hay que cambiarlo.
+    trajectory_topic: /display_planned_path
+
+    # ── Directorio de salida ───────────────────────────────────────────
+    # Vacio = automatico:
+    #   - ~/taller1/ros2_ws/trajectory_logs  si existe ese workspace
+    #     (caso del contenedor: el repositorio se monta en /root/taller1,
+    #      por lo que los CSV quedan visibles tambien desde el host)
+    #   - <directorio actual>/trajectory_logs en cualquier otro caso
+    # Se puede fijar una ruta absoluta, por ejemplo:
+    #   output_directory: /root/taller1/ros2_ws/trajectory_logs
+    output_directory: ''
+
+    # ── Salida por terminal ────────────────────────────────────────────
+    # true  = imprime todos los puntos de cada trayectoria
+    # false = imprime solo la cabecera (numero de puntos, duracion, joints)
+    #         El CSV se escribe igual en ambos casos.
+    print_points: true
+
+    # ── Datos a registrar ──────────────────────────────────────────────
+    # Controlan las columnas del CSV y el detalle impreso en terminal.
+    # Los valores NO se calculan: se copian del mensaje de MoveIt2.
+    # Si el mensaje no trae el campo, se guarda NaN.
+    save_velocities: true
+    save_accelerations: true
+
+    # MoveIt2 normalmente NO rellena effort en trayectorias planificadas.
+    # Activelo solo si su pipeline si lo entrega (el nodo avisa si detecta
+    # esfuerzos y este parametro esta en false).
+    save_effort: false
+
+    # ── Deteccion de mensajes duplicados ───────────────────────────────
+    # Ventana (s) dentro de la cual un mensaje con contenido identico al
+    # anterior se considera una republicacion del MISMO plan y se ignora.
+    # Dos planificaciones distintas nunca producen puntos y tiempos
+    # exactamente iguales, por lo que este filtro no pierde trayectorias.
+    duplicate_window_sec: 0.5

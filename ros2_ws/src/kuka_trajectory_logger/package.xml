@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>kuka_trajectory_logger</name>
+  <version>0.1.0</version>
+  <description>
+    Registrador pasivo de las trayectorias generadas por MoveIt2 para el robot
+    KUKA KR6 R900. Se suscribe a /display_planned_path
+    (moveit_msgs/msg/DisplayTrajectory) y guarda los puntos planificados
+    (posicion, velocidad, aceleracion y tiempo) en terminal y en CSV.
+    No publica, no ejecuta y no modifica ningun nodo existente.
+  </description>
+  <maintainer email="eduardex@todo.com">eduardex</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <depend>rclpy</depend>
+  <depend>moveit_msgs</depend>
+  <depend>trajectory_msgs</depend>
+  <depend>builtin_interfaces</depend>
+
+  <exec_depend>ros2launch</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
