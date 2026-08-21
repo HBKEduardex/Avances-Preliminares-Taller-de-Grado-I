@@ -80,14 +80,20 @@
   <!-- ============================================================ -->
   <link name="base_env_link">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <!-- Ajuste SOLO de la malla (el frame del link, el joint y el KUKA NO se mueven):
+           traslacion vertical PURA de dz = -0.030334282 m en Z de base_link,
+           expresada en el frame del link como R^T*(0,0,dz) con rpy = 1.57 0 0.
+           Resultado: Z_max(base.stl) = 0.000 m = cara inferior de la base del KUKA
+           (contacto exacto, sin penetracion). X, Y y rpy quedan intactos. -->
+      <origin xyz="0 -0.030334272 -0.000024156" rpy="0 0 0"/>
       <geometry>
         <mesh filename="package://kuka_kr6_support/meshes/environment/base.stl" scale="1 1 1"/>
       </geometry>
       <material name="env_dark"/>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <!-- Mismo desplazamiento que <visual>: collision y visual siguen superpuestos. -->
+      <origin xyz="0 -0.030334272 -0.000024156" rpy="0 0 0"/>
       <geometry>
         <mesh filename="package://kuka_kr6_support/meshes/environment/base.stl" scale="1 1 1"/>
       </geometry>
@@ -106,14 +112,20 @@
   <!-- ============================================================ -->
   <link name="mesa_env_link">
     <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <!-- Ajuste SOLO de la malla (el frame del link, el joint y el KUKA NO se mueven):
+           traslacion vertical PURA de dz = -0.030413915 m en Z de base_link,
+           expresada en el frame del link como R^T*(0,0,dz) con rpy = 1.57 0 1.57.
+           Resultado: Z_min(patas mesa) = Z_min(base.stl) = -0.560334282 m,
+           es decir ambas apoyan en el mismo plano. X, Y y rpy quedan intactos. -->
+      <origin xyz="0 -0.030413905 -0.000024219" rpy="0 0 0"/>
       <geometry>
         <mesh filename="package://kuka_kr6_support/meshes/environment/mesa.stl" scale="1 1 1"/>
       </geometry>
       <material name="env_gray"/>
     </visual>
     <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <!-- Mismo desplazamiento que <visual>: collision y visual siguen superpuestos. -->
+      <origin xyz="0 -0.030413905 -0.000024219" rpy="0 0 0"/>
       <geometry>
         <mesh filename="package://kuka_kr6_support/meshes/environment/mesa.stl" scale="1 1 1"/>
       </geometry>
