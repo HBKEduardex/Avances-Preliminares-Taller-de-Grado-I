@@ -1,0 +1,112 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# kuka_moveit_trajectory_planner
+#
+# Configuracion de los dos nodos del paquete:
+#   - kuka_trajectory_generator_node : GENERA trayectorias con MoveIt2 (solo plan)
+#   - kuka_trajectory_preview_node   : PREVISUALIZA en RViz2 (solo dibujo)
+#
+# Ninguno de los dos ejecuta nada ni escribe archivos.
+# ─────────────────────────────────────────────────────────────────────────────
+
+kuka_trajectory_generator_node:
+  ros__parameters:
+
+    # ── Contrato ROS con la GUI/TCP-IP (std_msgs/msg/String con JSON) ──
+    request_topic: /kuka_moveit/trajectory_generation/request_json
+    result_topic: /kuka_moveit/trajectory_generation/result_json
+    qos_depth: 10                       # RELIABLE, KEEP_LAST, VOLATILE
+
+    # ── MoveIt2 ────────────────────────────────────────────────────────
+    planning_group: manipulator
+    base_frame: base_link
+    move_action_name: /move_action
+    action_wait_timeout_sec: 30.0
+
+    # Vacio = pipeline y planner POR DEFECTO ya configurados en el proyecto
+    # (ompl / RRTConnectkConfigDefault). Dejar vacio para no alterar nada.
+    planning_pipeline_id: ''
+    planner_id: ''
+
+    # ── Parametros de planificacion ────────────────────────────────────
+    # Mismos valores que usa el resto del proyecto (bridge y pick&place).
+    planning_time: 10.0
+    planning_attempts: 10
+    velocity_scaling: 0.1
+    acceleration_scaling: 0.1
+
+    # Tolerancia del objetivo articular (en GRADOS, se convierte a rad).
+    # El ultimo punto de un segmento puede quedar a esta distancia de P(i+1).
+    joint_goal_tolerance_deg: 0.2
+
+    # Si el primer/ultimo punto devuelto por MoveIt2 se aleja mas que esto
+    # del estado pedido, se anade un aviso al resultado (NO se corrige nada).
+    endpoint_warning_tolerance_deg: 0.5
+
+    # ── Encadenado de segmentos ────────────────────────────────────────
+    # previous_trajectory_end : el inicio de T(i+1) es el ULTIMO punto real de
+    #                           Ti  => continuidad exacta entre segmentos.
+    # source_point            : el inicio de T(i+1) es el punto nominal P(i+1)
+    #                           tal y como lo envio la GUI.
+    segment_chaining: previous_trajectory_end
+
+    # Orden canonico de los joints si la peticion no trae joint_names.
+    joint_names:
+      - joint_a1
+      - joint_a2
+      - joint_a3
+      - joint_a4
+      - joint_a5
+      - joint_a6
+
+    # true = imprime en terminal todos los puntos de cada segmento.
+    log_points: false
+
+
+kuka_trajectory_preview_node:
+  ros__parameters:
+
+    # ── Contrato ROS con la GUI/TCP-IP ────────────────────────────────
+    request_topic: /kuka_moveit/trajectory_preview/request_json
+    status_topic: /kuka_moveit/trajectory_preview/status_json
+    qos_depth: 10
+
+    # ── Visualizacion 1: mecanismo nativo MoveIt2/RViz2 ───────────────
+    # El display "Planned Path" del panel MotionPlanning ya escucha aqui.
+    display_trajectory_topic: /display_planned_path
+
+    # ── Visualizacion 2: topico EXCLUSIVO de preview ──────────────────
+    # Reproduccion punto a punto respetando time_from_start sobre un unico
+    # reloj global que nunca vuelve a cero entre segmentos.
+    # Requiere anadir en RViz un display "RobotState" apuntando aqui.
+    robot_state_topic: /kuka_moveit/trajectory_preview/robot_state
+    publish_robot_state: true
+
+    # Escala de tiempo SOLO de la reproduccion (no altera los datos).
+    playback_rate: 1.0
+
+    # ── Secuencia visual continua ─────────────────────────────────────
+    # Las trayectorias de MoveIt2 repiten la pose de cada frontera
+    # (Ti[-1] == T(i+1)[0]). Para la REPRODUCCION esa pose se dibuja una sola
+    # vez. Esta es la tolerancia (rad) para darla por duplicada; si las poses
+    # no coinciden, no se omite nada. El JSON guardado no se modifica.
+    boundary_tolerance_rad: 0.000001
+
+    # Hueco anadido al reloj global SOLO entre segmentos cuya frontera NO
+    # estaba duplicada. 0.0 = secuencia totalmente continua (recomendado:
+    # cualquier valor > 0 se ve como una parada del robot en la frontera).
+    inter_segment_gap_sec: 0.0
+
+    # Publicar un status "playing" adicional al empezar cada segmento.
+    publish_segment_status: true
+
+    # Nombre del modelo para DisplayTrajectory.model_id.
+    # Vacio = RViz no compara nombres (evita avisos innecesarios).
+    robot_model_name: ''
+
+    joint_names:
+      - joint_a1
+      - joint_a2
+      - joint_a3
+      - joint_a4
+      - joint_a5
+      - joint_a6

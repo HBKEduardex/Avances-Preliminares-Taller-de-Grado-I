@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>kuka_moveit_trajectory_planner</name>
+  <version>0.1.0</version>
+  <description>
+    Generacion y previsualizacion de trayectorias MoveIt2 para el KUKA KR6 R900
+    a partir de una lista de configuraciones articulares (en grados) enviada por
+    una GUI externa mediante JSON sobre std_msgs/msg/String.
+
+    El paquete SOLO planifica (plan_only=true) y SOLO previsualiza en RViz2.
+    Nunca ejecuta trayectorias, nunca publica en /joint_states, /fake_joint_states
+    ni en ningun topico del bridge TCP/IP, y no guarda ningun archivo: el
+    resultado se publica en un topico para que el otro entorno lo almacene.
+  </description>
+  <maintainer email="eduardex@todo.com">eduardex</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>moveit_msgs</depend>
+  <depend>trajectory_msgs</depend>
+  <depend>builtin_interfaces</depend>
+
+  <exec_depend>ros2launch</exec_depend>
+  <!-- Solo se necesita que este sistema ya este corriendo; este paquete no lo lanza. -->
+  <exec_depend>kuka_kr6_moveit_config</exec_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
