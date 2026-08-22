@@ -176,6 +176,27 @@ source install/setup.bash
 
 ---
 
+## 🌐 Variables de entorno DDS
+
+Antes de lanzar cualquier nodo, exporta estas dos variables **en cada terminal ROS2** del contenedor (tanto en la del `attach` como en las abiertas con `docker exec`):
+
+```bash
+export FASTDDS_BUILTIN_TRANSPORTS=UDPv4
+export ROS_LOCALHOST_ONLY=0
+```
+
+* `FASTDDS_BUILTIN_TRANSPORTS=UDPv4`: obliga a Fast DDS a comunicarse únicamente por UDPv4, desactivando el transporte de memoria compartida. Evita los bloqueos y descubrimientos incompletos que se producen entre el contenedor y el host cuando se usa memoria compartida.
+* `ROS_LOCALHOST_ONLY=0`: no restringe el tráfico ROS2 a `localhost`, de modo que los nodos son visibles fuera de la máquina. Es necesario para la comunicación con el entorno externo del robot real.
+
+> [!TIP]
+> Para no repetirlos en cada terminal, añádelos al `~/.bashrc` dentro del contenedor:
+> ```bash
+> echo 'export FASTDDS_BUILTIN_TRANSPORTS=UDPv4' >> ~/.bashrc
+> echo 'export ROS_LOCALHOST_ONLY=0' >> ~/.bashrc
+> ```
+
+---
+
 ## 🛠️ Compilación
 
 Siempre que modifiques lógica de nodos, archivos XACRO, o CMake, debes compilar el entorno desde el interior del contenedor.
