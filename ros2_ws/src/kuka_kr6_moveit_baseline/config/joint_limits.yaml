@@ -1,0 +1,50 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# joint_limits.yaml — CONDICION MOVEIT2 BASE
+#
+# DERIVADO MECANICAMENTE del URDF copiado en
+#   urdf/kr6r900sixx_macro.xacro  (lineas 115-156)
+# que a su vez es copia identica de kuka_kr6_support. Ningun valor procede
+# del sistema afinado, de un datasheet, ni de una estimacion.
+#
+# REGLA APLICADA:
+#   max_velocity  <- atributo velocity="${radians(N)}" del <limit> del URDF
+#   posicion      <- lower/upper del <limit> del URDF (no se replican aqui:
+#                    MoveIt los toma directamente del URDF)
+#   aceleracion   <- el URDF NO declara ningun limite de aceleracion, asi que
+#                    has_acceleration_limits queda en false. NO se inventa.
+#
+# HALLAZGO DEL ESTUDIO (ver README seccion 10):
+#   Con has_acceleration_limits: false, el adaptador
+#   AddTimeOptimalParameterization (TOTG) parametriza el tiempo SIN
+#   restriccion de aceleracion. Es una causa candidata documentada del jerk
+#   elevado de la condicion base.
+#
+# Este archivo SI se carga en el launch como robot_description_planning.
+# (En el sistema afinado existe un joint_limits.yaml equivalente que
+#  demo.launch.py NUNCA carga: ver README seccion 3.)
+# ─────────────────────────────────────────────────────────────────────────────
+joint_limits:
+  joint_a1:
+    has_velocity_limits: true
+    max_velocity: 6.283185307179586      # radians(360)
+    has_acceleration_limits: false
+  joint_a2:
+    has_velocity_limits: true
+    max_velocity: 5.235987755982988      # radians(300)
+    has_acceleration_limits: false
+  joint_a3:
+    has_velocity_limits: true
+    max_velocity: 6.283185307179586      # radians(360)
+    has_acceleration_limits: false
+  joint_a4:
+    has_velocity_limits: true
+    max_velocity: 6.649704450098396      # radians(381)
+    has_acceleration_limits: false
+  joint_a5:
+    has_velocity_limits: true
+    max_velocity: 6.771877497737998      # radians(388)
+    has_acceleration_limits: false
+  joint_a6:
+    has_velocity_limits: true
+    max_velocity: 10.733774899765127     # radians(615)
+    has_acceleration_limits: false

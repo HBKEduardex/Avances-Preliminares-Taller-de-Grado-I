@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>kuka_kr6_moveit_baseline</name>
+  <version>1.0.0</version>
+  <description>
+    CONDICION "MOVEIT2 BASE" del estudio comparativo de tres condiciones
+    (KRL nativo / MoveIt2 base / MoveIt2 + mejora) del Taller de Grado 2.
+
+    Artefacto experimental de referencia academica. Levanta el KUKA KR6 R900 y
+    su celda con MoveIt2 configurado de forma predeterminada, sin ninguno de
+    los ajustes posteriores del operador, y mide la discontinuidad articular y
+    la proximidad a singularidades de las trayectorias que MoveIt2 produce.
+
+    SOLO PLANIFICA Y VISUALIZA. No ejecuta movimiento, no se conecta al robot
+    fisico y no contiene ninguna ruta de codigo capaz de hacerlo.
+
+    Paquete AUTOCONTENIDO y CONGELADO: el modelo, las mallas y la
+    configuracion son copias locales del commit 0c2c022, no referencias
+    cruzadas, para que la condicion base no cambie si evoluciona la rama de
+    mejora.
+  </description>
+  <maintainer email="adrian.vargas@ucb.edu.bo">eduardex</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>shape_msgs</depend>
+  <depend>moveit_msgs</depend>
+  <depend>trajectory_msgs</depend>
+  <depend>builtin_interfaces</depend>
+  <depend>tf2_ros</depend>
+  <depend>python3-numpy</depend>
+
+  <exec_depend>ros2launch</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>moveit_ros_move_group</exec_depend>
+  <exec_depend>moveit_planners_ompl</exec_depend>
+  <exec_depend>moveit_kinematics</exec_depend>
+  <exec_depend>moveit_ros_visualization</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>python3-tk</exec_depend>
+
+  <!-- NO se depende de kuka_kr6_support, kuka_resources,
+       kuka_kr6_moveit_config, kuka_gui_moveit_bridge ni kuka_trajectory_logger:
+       el paquete es autocontenido a proposito (propiedad de congelamiento). -->
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

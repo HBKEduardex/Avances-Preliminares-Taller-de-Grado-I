@@ -1,0 +1,23 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# kuka_kr6_moveit_baseline — .gitignore
+#
+# El paquete es un artefacto CONGELADO del estudio comparativo. Su valor
+# depende de que `git status` permanezca limpio: cualquier entrada que
+# aparezca ahi debe significar "el baseline fue alterado", nunca "se ejecuto
+# un analisis".
+#
+# Por eso la salida de datos del analizador de continuidad queda ignorada:
+# los CSV son RESULTADOS EXPERIMENTALES, no fuentes del paquete.
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Salida del analizador de continuidad: todo el contenido, menos el marcador
+# que mantiene la carpeta en el arbol.
+analysis_output/*
+!analysis_output/.gitkeep
+
+# Artefactos de Python y de las herramientas de calidad
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage

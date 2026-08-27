@@ -1,0 +1,130 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# BASELINE_METADATA.yaml
+# Metadatos de reproducibilidad de la condicion MOVEIT2 BASE.
+# Taller de Grado 2 — estudio comparativo de tres condiciones.
+# ═══════════════════════════════════════════════════════════════════════════
+
+baseline:
+  package: kuka_kr6_moveit_baseline
+  version: 1.0.0
+  condition: "MoveIt2 base (condicion de referencia sin ajustes del operador)"
+  created: "2026-08-27"
+  role: >-
+    Condicion 2 de 3 del estudio comparativo:
+    (1) KRL nativo, (2) MoveIt2 base, (3) MoveIt2 + mejora.
+
+entorno:
+  sistema_operativo: "Ubuntu 22.04.5 LTS (jammy)"
+  fuente_so: "/usr/lib/os-release del contenedor kuka_ros2_humble_container"
+  ros2_distro: "Humble Hawksbill"
+  ros2_prefix: "/opt/ros/humble"
+  moveit2_version: "2.5.9"
+  fuente_moveit2: >-
+    <version> de /opt/ros/humble/share/moveit_core/package.xml,
+    moveit_configs_utils, moveit_planners_ompl, moveit_kinematics,
+    moveit_ros_planning y moveit_setup_framework (todos 2.5.9)
+  contenedor: "kuka_ros2_humble_container (imagen base osrf/ros:humble-desktop)"
+
+fork:
+  repositorio: "taller1"
+  commit_origen: "0c2c022372e27aadaf9b2df34fd2023f8e4ac28b"
+  commit_corto: "0c2c022"
+  commit_titulo: >-
+    feat: implement trajectory generator node for KUKA MoveIt planning
+    via JSON contract
+  paquetes_origen:
+    - kuka_kr6_support      # URDF/xacro del robot y de la celda, mallas
+    - kuka_resources        # xacro comunes (constants, materials, colours)
+    - kuka_gui_moveit_bridge  # GUI de pruebas (solo como referencia del fork)
+  estado_arbol_al_copiar: "limpio"
+
+alcance:
+  planifica: true
+  visualiza: true
+  ejecuta_movimiento: false
+  se_conecta_al_robot: false
+  escribe_fuera_del_paquete: false
+  motivo_sin_ejecucion: >-
+    Limite 4 de la seccion 1.4.1 de la propuesta: la validacion preliminar se
+    limita a la visualizacion y evaluacion cinematica mediante ROS2, RViz2 y
+    MoveIt2. Ademas ros2_control no esta instalado en este contenedor, por lo
+    que el controlador simulado por defecto del Setup Assistant no es
+    replicable aqui.
+
+hallazgos_registrados:
+  home_singular:
+    home_baseline_deg: [0.0, -90.0, 90.0, 0.0, 0.0, 0.0]
+    home_afinado_deg: [0.0, -90.0, 90.0, 0.0, 90.0, 0.0]
+    singularidad_confirmada: true
+    alineacion_a4_a6: 1.0
+    angulo_entre_ejes_a4_a6_deg: 0.0
+    rank_jacobiano: 5
+    sigma_min: 7.850462e-17
+    cond_jacobiano: .inf
+    cond_jacobiano_muñeca: .inf
+    comparacion_a5_90:
+      rank_jacobiano: 6
+      sigma_min: 0.238396
+      cond_jacobiano: 7.592734
+      cond_jacobiano_muñeca: 1.0
+  limites_de_aceleracion:
+    declarados_en_urdf: false
+    has_acceleration_limits: false
+    consecuencia: >-
+      TOTG (AddTimeOptimalParameterization) parametriza el tiempo sin
+      restriccion de aceleracion. Causa candidata documentada del jerk elevado
+      de la condicion base.
+  pose_home_calculada:
+    frame: base_link
+    tip: tool0
+    tip_nota: >-
+      Declarado por <chain base_link="base_link" tip_link="tool0"/>, que es
+      lo que produce un Setup Assistant real con este URDF (REP-199).
+      link_6, flange y tool0 comparten origen exacto (las dos
+      transformadas fijas intermedias tienen traslacion nula), asi que el
+      Jacobiano geometrico es BIT A BIT IDENTICO en los tres:
+      |J - J(link_6)|_max = 0.000e+00. rank, sigma_min y cond(J) no
+      cambian. La unica diferencia es la referencia de ORIENTACION de los
+      objetivos cartesianos: tool0 = link_6 girado +90 deg en Y.
+    xyz_m: [0.525, 0.0, 0.890]
+    xyz_world_m: [0.525, 0.0, 1.390]
+    abc_deg: [0.0, 0.0, 0.0]
+
+# ═══════════════════════════════════════════════════════════════════════════
+# HALLAZGOS VERIFICADOS CONTRA EL BINARIO DE MOVEIT 2.5.9
+# (host y contenedor comparten version: moveit_core 2.5.9 en ambos)
+# ═══════════════════════════════════════════════════════════════════════════
+totg:
+  fuente: >-
+    /opt/ros/humble/include/moveit/trajectory_processing/
+    time_optimal_trajectory_generation.h  y  desensamblado de
+    /opt/ros/humble/lib/libmoveit_trajectory_processing.so.2.5.9,
+    simbolo TimeOptimalTrajectoryGeneration::computeTimeStamps
+  path_tolerance: 0.1
+  resample_dt: 0.1
+  min_angle_change: 0.001
+  resample_dt_confirmado_empiricamente: >-
+    171 de 185 intervalos de la trayectoria de referencia miden exactamente
+    0.100000 s; los 14 restantes son el resto final de cada segmento.
+  limite_velocidad_por_defecto: 1.0        # rad/s,   si no hay bound
+  limite_aceleracion_por_defecto: 1.0      # rad/s^2, si no hay bound
+  el_escalado_se_aplica_al_defecto: false
+  nota: >-
+    El defecto se guarda SIEMPRE (movsd %xmm3,(%rax) antes del branch) y la
+    rama 'bounded' lo sobrescribe aplicando el factor de escalado. Si el
+    limite no esta declarado, el defecto 1.0 queda TAL CUAL, sin escalar.
+    TOTG NO falla por ausencia de limites: el mensaje "acceleration limits
+    are not defined" pertenece a ruckig_traj_smoothing.cpp, y Ruckig NO esta
+    en los 6 request_adapters por defecto.
+
+limite_aceleracion_efectivo:
+  afinado: 1.0     # 10.0 declarado x 0.1 de escalado
+  baseline: 1.0    # defecto interno de TOTG, sin escalar
+  son_identicos: true
+
+jerk:
+  entregado_por_moveit: false
+  metodo: diferencia centrada sobre las aceleraciones de TOTG
+  cota_del_artefacto_rad_s3: 10.0   # 2*1.0/(2*0.1)
+  maximo_medido_rad_s3: 10.0        # se alcanza exactamente, en A1 y A5
+  comparable_entre_condiciones: false

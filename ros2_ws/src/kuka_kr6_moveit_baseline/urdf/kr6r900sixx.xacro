@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<robot name="kuka_kr6r900sixx" xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:include filename="$(find kuka_kr6_moveit_baseline)/urdf/kr6r900sixx_macro.xacro" />
+  <xacro:kuka_kr6r900sixx prefix=""/>
+
+  <!-- Environment elements (base, mesa, gripper, cubo) -->
+  <xacro:include filename="$(find kuka_kr6_moveit_baseline)/urdf/environment.xacro" />
+</robot>
