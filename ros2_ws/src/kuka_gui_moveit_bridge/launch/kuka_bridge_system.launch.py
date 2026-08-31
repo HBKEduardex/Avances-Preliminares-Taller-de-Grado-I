@@ -30,6 +30,16 @@ def generate_launch_description():
         description='Inicia la GUI interna de pruebas (Tkinter)'
     )
 
+    # Argumento para seleccionar la herramienta representada en el flange.
+    # Solo cambia la geometria (visual + collision) del gripper_env_link:
+    # ni el frame, ni el TCP, ni la cadena cinematica cambian.
+    tool_arg = DeclareLaunchArgument(
+        'tool',
+        default_value='gripper',
+        choices=['gripper', 'marker'],
+        description='Herramienta representada en el flange: gripper | marker'
+    )
+
     # ── Nodos y Launch files ─────────────────────────────────────────────────
 
     # 1. kuka_kr6_moveit_config/demo.launch.py
@@ -38,7 +48,8 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(demo_launch_file),
         launch_arguments={
             'use_gui': 'false',
-            'use_rviz': 'true'
+            'use_rviz': 'true',
+            'tool': LaunchConfiguration('tool')
         }.items()
     )
 
@@ -71,6 +82,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         use_test_gui_arg,
+        tool_arg,
         moveit_rviz_launch,
         fake_controller_node,
         bridge_node,

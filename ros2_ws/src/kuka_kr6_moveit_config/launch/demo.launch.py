@@ -41,6 +41,10 @@ def generate_launch_description():
     robot_model_arg = DeclareLaunchArgument(
         "robot_model", default_value="kr6r900sixx", description="Robot model"
     )
+    tool_arg = DeclareLaunchArgument(
+        "tool", default_value="gripper", choices=["gripper", "marker"],
+        description="Herramienta representada en el flange: gripper | marker"
+    )
     rviz_config_arg = DeclareLaunchArgument(
         "rviz_config", 
         default_value=PathJoinSubstitution([FindPackageShare("kuka_kr6_moveit_config"), "rviz", "moveit.rviz"]),
@@ -57,7 +61,8 @@ def generate_launch_description():
         "kr6r900sixx.xacro"
     ])
     robot_description_content = ParameterValue(
-        Command(["xacro ", xacro_file]), value_type=str
+        Command(["xacro ", xacro_file, " tool:=", LaunchConfiguration("tool")]),
+        value_type=str
     )
     robot_description = {"robot_description": robot_description_content}
 
@@ -182,6 +187,7 @@ def generate_launch_description():
         fixed_frame_arg,
         planning_group_arg,
         robot_model_arg,
+        tool_arg,
         rviz_config_arg,
         robot_state_publisher_node,
         joint_state_publisher_gui_node,

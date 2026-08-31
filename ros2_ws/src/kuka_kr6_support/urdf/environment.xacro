@@ -47,6 +47,13 @@
   <xacro:property name="cubo_P"       default="0"/>
   <xacro:property name="cubo_Y"       default="0"/>
 
+  <!-- ── Tool selection: gripper (default) | marker ──────────────── -->
+  <!-- Selecciona SOLO la geometria representada dentro de gripper_env_link.
+       No crea links, joints ni frames nuevos: la cadena cinematica, el flange
+       y el TCP son identicos para ambos valores.                              -->
+  <xacro:arg name="tool" default="gripper"/>
+  <xacro:property name="tool" value="$(arg tool)"/>
+
   <!-- ── Robot vertical offset (raises KUKA relative to env) ───── -->
   <!-- Increase to raise the robot above the pedestal/mesa          -->
   <xacro:property name="robot_z_offset" default="0"/>
@@ -143,6 +150,10 @@
   <!--  3. gripper_env_link – gripper fijo al flange del robot       -->
   <!-- ============================================================ -->
   <link name="gripper_env_link">
+    <!-- Herramienta seleccionable:  tool:=gripper (por defecto) | tool:=marker
+         Las dos ramas son mutuamente excluyentes; comparten este mismo link,
+         el mismo frame y el mismo gripper_env_joint (que NO se toca). -->
+    <xacro:if value="${tool == 'gripper'}">
     <visual>
       <!-- Ajuste SOLO de la malla (el frame del link NO se mueve):
            eje longitudinal del STL (+X mesh) alineado con +Z del link,
@@ -164,6 +175,32 @@
         <mesh filename="package://kuka_kr6_support/meshes/environment/gripper.stl" scale="1 1 1"/>
       </geometry>
     </collision>
+    </xacro:if>
+
+    <xacro:if value="${tool == 'marker'}">
+    <visual>
+      <!-- Ajuste SOLO de la malla (mismo frame que el gripper, sin tocar el joint):
+           eje longitudinal del STL (+Y mesh, 0..147mm) alineado con +Z del link,
+           eje de la placa de montaje (X=22.5mm, Z=22.5mm del STL) sobre el eje
+           del flange, y cara de montaje (disco de 45mm en y=0) al ras del flange.
+           El yaw de 2.35619 rad (135 deg) es un giro PURO sobre el eje de la
+           herramienta: deja el talon de montaje arriba y no altera ni el apoyo
+           ni la coaxialidad. -->
+      <origin xyz="0 -0.0318198 0" rpy="1.5708 0 2.35619"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_support/meshes/environment/marker.stl" scale="1 1 1"/>
+      </geometry>
+      <material name="env_gray"/>
+    </visual>
+    <collision>
+      <!-- Volumen fisico del marcador para MoveIt2: misma malla y EXACTAMENTE la
+           misma transformacion que su <visual>. -->
+      <origin xyz="0 -0.0318198 0" rpy="1.5708 0 2.35619"/>
+      <geometry>
+        <mesh filename="package://kuka_kr6_support/meshes/environment/marker.stl" scale="1 1 1"/>
+      </geometry>
+    </collision>
+    </xacro:if>
   </link>
 
   <joint name="gripper_env_joint" type="fixed">
@@ -177,6 +214,11 @@
   <!--  4. cubo_env_link – cubo sujetado por el gripper              -->
   <!-- ============================================================ -->
   <link name="cubo_env_link">
+    <!-- El cubo es la pieza que sujeta el gripper: solo se representa con
+         tool:=gripper. Con tool:=marker el link y su cubo_env_joint siguen
+         existiendo (frame y TF intactos, referencias del SRDF validas) pero
+         no llevan geometria, asi que no se ve nada. -->
+    <xacro:if value="${tool == 'gripper'}">
     <visual>
       <!-- Ajuste SOLO visual: centra el cubo (30mm) entre las mordazas, sobre el eje
            del gripper y a 118mm del flange (zona de agarre; puntas a 144mm).
@@ -193,6 +235,7 @@
         <mesh filename="package://kuka_kr6_support/meshes/environment/cubo.stl" scale="1 1 1"/>
       </geometry>
     </collision>
+    </xacro:if>
   </link>
 
   <joint name="cubo_env_joint" type="fixed">

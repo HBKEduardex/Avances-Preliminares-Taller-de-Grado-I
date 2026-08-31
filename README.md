@@ -125,10 +125,10 @@ A continuación se resume la función de los paquetes desarrollados:
 | Launch | Paquete | Uso |
 |---|---|---|
 | `display.launch.py` | kuka_kr6_support | Visualización básica del robot |
-| `demo.launch.py` | kuka_kr6_moveit_config | MoveIt2, RViz2, GUI o fake hardware |
+| `demo.launch.py` | kuka_kr6_moveit_config | MoveIt2, RViz2, GUI o fake hardware. Acepta `tool:=gripper\|marker` |
 | `point_recorder.launch.py` | kuka_pick_place_demo | Guardar puntos desde /joint_states |
 | `pick_place_sequence.launch.py` | kuka_pick_place_demo | Validar o ejecutar secuencia YAML |
-| `kuka_bridge_system.launch.py` | kuka_gui_moveit_bridge | MoveIt2 + RViz2 + controlador simulado + puente para la GUI |
+| `kuka_bridge_system.launch.py` | kuka_gui_moveit_bridge | MoveIt2 + RViz2 + controlador simulado + puente para la GUI. Acepta `tool:=gripper\|marker` |
 | `trajectory_logger.launch.py` | kuka_trajectory_logger | Registrar en CSV las trayectorias planificadas |
 | `trajectory_planner.launch.py` | kuka_moveit_trajectory_planner | Generación por segmentos y previsualización (adicional y opcional) |
 
@@ -252,6 +252,60 @@ ros2 launch kuka_kr6_moveit_config demo.launch.py use_gui:=true use_rviz:=true
 ```bash
 ros2 launch kuka_kr6_moveit_config demo.launch.py use_fake_hardware:=true use_gui:=false use_rviz:=true
 ```
+
+---
+
+## 🔧 Selección de herramienta (gripper / marker)
+
+El argumento `tool` elige **qué herramienta se representa en el flange**. Es el mismo
+launch de siempre: sólo cambia la geometría dibujada y su volumen de colisión.
+
+| Argumento | Valores | Por defecto |
+|---|---|---|
+| `tool` | `gripper` \| `marker` | `gripper` |
+
+```bash
+# Sistema completo (bridge + MoveIt2 + RViz2) — comportamiento de siempre: GRIPPER
+ros2 launch kuka_gui_moveit_bridge kuka_bridge_system.launch.py
+
+# Gripper explícito
+ros2 launch kuka_gui_moveit_bridge kuka_bridge_system.launch.py tool:=gripper
+
+# Marcador
+ros2 launch kuka_gui_moveit_bridge kuka_bridge_system.launch.py tool:=marker
+```
+
+El mismo argumento existe en el launch de MoveIt2, por si lo levantas suelto:
+
+```bash
+ros2 launch kuka_kr6_moveit_config demo.launch.py use_gui:=true use_rviz:=true tool:=marker
+```
+
+### Qué cambia y qué no
+
+| Con `tool:=gripper` | Con `tool:=marker` |
+|---|---|
+| Visual + collision del **gripper** | Visual + collision del **marcador** |
+| Cubo azul visible | Cubo azul oculto |
+
+La selección es **mutuamente excluyente**: nunca aparecen gripper y marcador a la vez.
+
+> [!IMPORTANT]
+> Cambiar de herramienta **no altera la cinemática**. `X Y Z A B C`, el TCP, el
+> `flange`, los frames TF, los joints y toda la cadena cinemática son idénticos con
+> los dos valores: las dos ramas comparten el mismo `gripper_env_link` y el mismo
+> `gripper_env_joint`. Lo único que cambia es la malla dibujada dentro de ese frame
+> y el volumen que MoveIt2 usa para detectar colisiones.
+
+La selección está implementada en `kuka_kr6_support/urdf/environment.xacro` mediante
+`<xacro:arg name="tool" default="gripper"/>` y dos bloques `<xacro:if>` dentro del
+link de la herramienta. Las mallas viven en
+`kuka_kr6_support/meshes/environment/` (`gripper.stl`, `marker.stl`).
+
+> [!WARNING]
+> Tras añadir o cambiar una malla de herramienta hay que **recompilar** el workspace
+> (`colcon build --symlink-install`), porque los STL se instalan como enlaces creados
+> en tiempo de compilación y un archivo nuevo todavía no tiene el suyo.
 
 ---
 
