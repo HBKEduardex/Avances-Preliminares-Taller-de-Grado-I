@@ -309,6 +309,62 @@ link de la herramienta. Las mallas viven en
 
 ---
 
+## 🔌 Nodos para la GUI externa (generación y previsualización por JSON)
+
+Los dos nodos que hablan con la **GUI externa** (`kuka_gui_control`) por los cuatro
+tópicos JSON del contrato **no se levantan solos**: `trajectory_planner.launch.py`
+arranca **únicamente** sus dos nodos, sin MoveIt2 ni RViz2. Hay que lanzarlo
+**además** del sistema, en una segunda terminal.
+
+**Terminal 1 — MoveIt2 y RViz2** (cualquiera de las dos opciones):
+
+```bash
+ros2 launch kuka_kr6_moveit_config demo.launch.py use_gui:=false use_rviz:=true
+```
+
+```bash
+ros2 launch kuka_gui_moveit_bridge kuka_bridge_system.launch.py
+```
+
+**Terminal 2 — los nodos del contrato JSON:**
+
+```bash
+ros2 launch kuka_moveit_trajectory_planner trajectory_planner.launch.py
+```
+
+Arranca `kuka_trajectory_generator_node` (genera) y `kuka_trajectory_preview_node`
+(previsualiza). Ambos son **adicionales y opcionales**: se pueden iniciar y detener
+en cualquier momento sin afectar a MoveIt2, a RViz2 ni al bridge.
+
+**Comprobar que están escuchando:**
+
+```bash
+ros2 topic info /kuka_moveit/trajectory_generation/request_json -v
+```
+
+Debe indicar `Subscription count: 1`. Los cuatro tópicos del contrato son:
+
+| Tópico | Sentido |
+|---|---|
+| `/kuka_moveit/trajectory_generation/request_json` | GUI → generador |
+| `/kuka_moveit/trajectory_generation/result_json` | generador → GUI |
+| `/kuka_moveit/trajectory_preview/request_json` | GUI → previsualización |
+| `/kuka_moveit/trajectory_preview/status_json` | previsualización → GUI |
+
+Con eso, desde la GUI externa: **ENVIAR TRAYECTORIA** genera y **PROBAR TRAYECTORIA**
+previsualiza en RViz2.
+
+> [!IMPORTANT]
+> Este flujo usa la configuración **afinada** de MoveIt2 (`kuka_kr6_moveit_config`).
+> No es la condición base del estudio comparativo, que vive en el paquete
+> independiente `kuka_kr6_moveit_baseline` y no expone tópicos JSON.
+
+> [!NOTE]
+> El argumento `tool` se aplica en la **terminal 1**, que es la que carga el modelo.
+> `trajectory_planner.launch.py` no lo necesita: no carga `robot_description`.
+
+---
+
 ## 🎮 Seteo visual de puntos
 
 ### Caso A: crear nuevos puntos desde cero
