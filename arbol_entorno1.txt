@@ -1,0 +1,149 @@
+.
+├── arbol_entorno1.txt
+├── .claude
+│   ├── settings.json
+│   └── settings.local.json
+├── docker
+│   └── Dockerfile
+├── docs
+│   └── gifs
+│       └── pick&place.gif
+├── .gitignore
+├── README.md
+├── references
+│   └── kuka_experimental
+│       ├── kuka_kr6_support
+│       │   ├── CMakeLists.txt
+│       │   ├── config
+│       │   ├── launch
+│       │   ├── meshes
+│       │   ├── package.xml
+│       │   ├── test
+│       │   └── urdf
+│       └── kuka_resources
+│           ├── CMakeLists.txt
+│           ├── package.xml
+│           └── urdf
+├── resultados_afinamiento
+│   ├── comparacion_afinamiento_metadatos.json
+│   ├── comparacion_afinamiento_resumen.csv
+│   ├── comparacion_base_vs_afinado PAP.csv
+│   ├── comparacion_base_vs_afinado PAP.png
+│   ├── comparacion_tramo_comun_articular.png
+│   ├── comparacion_tramo_comun_detalle.csv
+│   ├── comparacion_tramo_comun_metadatos.json
+│   └── comparacion_tramo_comun_resumen.csv
+├── ros2_ws
+│   ├── src
+│   │   ├── kuka_gui_moveit_bridge
+│   │   │   ├── config
+│   │   │   ├── kuka_gui_moveit_bridge
+│   │   │   ├── launch
+│   │   │   ├── package.xml
+│   │   │   ├── README.md
+│   │   │   ├── resource
+│   │   │   ├── setup.cfg
+│   │   │   ├── setup.py
+│   │   │   └── test
+│   │   ├── kuka_kr6_moveit_baseline
+│   │   │   ├── analysis_output
+│   │   │   ├── BASELINE_METADATA.yaml
+│   │   │   ├── config
+│   │   │   ├── .gitignore
+│   │   │   ├── kuka_kr6_moveit_baseline
+│   │   │   ├── launch
+│   │   │   ├── meshes
+│   │   │   ├── package.xml
+│   │   │   ├── README.md
+│   │   │   ├── resource
+│   │   │   ├── rviz
+│   │   │   ├── setup.cfg
+│   │   │   ├── setup.py
+│   │   │   └── urdf
+│   │   ├── kuka_kr6_moveit_config
+│   │   │   ├── CMakeLists.txt
+│   │   │   ├── config
+│   │   │   ├── launch
+│   │   │   ├── package.xml
+│   │   │   └── rviz
+│   │   ├── kuka_kr6_support
+│   │   │   ├── CMakeLists.txt
+│   │   │   ├── config
+│   │   │   ├── launch
+│   │   │   ├── meshes
+│   │   │   ├── package.xml
+│   │   │   ├── scripts
+│   │   │   └── urdf
+│   │   ├── kuka_moveit_trajectory_planner
+│   │   │   ├── config
+│   │   │   ├── kuka_moveit_trajectory_planner
+│   │   │   ├── launch
+│   │   │   ├── package.xml
+│   │   │   ├── README.md
+│   │   │   ├── resource
+│   │   │   ├── setup.cfg
+│   │   │   ├── setup.py
+│   │   │   └── test
+│   │   ├── kuka_pick_place_demo
+│   │   │   ├── config
+│   │   │   ├── kuka_pick_place_demo
+│   │   │   ├── launch
+│   │   │   ├── package.xml
+│   │   │   ├── resource
+│   │   │   ├── setup.cfg
+│   │   │   └── setup.py
+│   │   ├── kuka_pick_place_interfaces
+│   │   │   ├── CMakeLists.txt
+│   │   │   ├── package.xml
+│   │   │   └── srv
+│   │   ├── kuka_resources
+│   │   │   ├── CMakeLists.txt
+│   │   │   ├── package.xml
+│   │   │   └── urdf
+│   │   └── kuka_trajectory_logger
+│   │       ├── config
+│   │       ├── kuka_trajectory_logger
+│   │       ├── launch
+│   │       ├── package.xml
+│   │       ├── README.md
+│   │       ├── resource
+│   │       ├── setup.cfg
+│   │       ├── setup.py
+│   │       └── test
+│   └── trajectory_logs
+│       └── moveit_trajectories_20260819_222010.csv
+├── rviz_vis.rviz
+├── scripts
+│   ├── attach_container.sh
+│   ├── build_image.sh
+│   ├── clean_ros2_build.sh
+│   ├── create_container.sh
+│   ├── launch_rviz.sh
+│   ├── start_container.sh
+│   └── stop_container.sh
+├── STL_ENVIRONMENT
+│   ├── base.stl
+│   ├── CUBO.STL
+│   ├── gripper.stl
+│   ├── marker.STL
+│   └── mesa.stl
+├── tools
+│   └── compare_planned_trajectories.py
+├── trajectories
+│   ├── README.md
+│   ├── trajectory_sequence_20260822_164132.json
+│   └── trajectory_sequence_20260822_193944.json
+└── trajectories_baseline
+    ├── baseline_articular_vel5_20260902_073954.json
+    ├── baseline_cartesiano_20260902_062242.json
+    ├── baseline_cartesiano_20260902_063558.json
+    ├── baseline_cartesiano_20260902_064321.json
+    ├── baseline_cartesiano_vel5_20260902_073740.json
+    ├── baseline_cartesiano_vel5_20260902_073757.json
+    ├── baseline_cartesiano_vel5_20260902_073902.json
+    ├── baseline_cartesiano_vel5_20260902_073920.json
+    ├── baseline_cartesiano_vel5_20260902_074010.json
+    ├── baseline_cartesiano_vel5_20260902_074029.json
+    └── baseline_cartesiano_vel5_20260902_074046.json
+
+69 directories, 77 files

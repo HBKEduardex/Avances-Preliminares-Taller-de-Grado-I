@@ -1,0 +1,82 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# joint_limits_pipeline.yaml — CONDICION BASE + LIMITES REALES DE EJECUCION
+#
+# Identico a joint_limits.yaml (velocidades derivadas MECANICAMENTE del URDF,
+# sin limite de aceleracion) MAS los limites de POSICION que exige el pipeline
+# de ejecucion KUKA.
+#
+# POR QUE EXISTE ESTE ARCHIVO
+#   El URDF declara limites de posicion 10 grados mas anchos POR LADO que los
+#   que acepta el pipeline real. MoveIt planificaba dentro del URDF y producia
+#   puntos perfectamente legales para el modelo e ilegales para el robot:
+#
+#       medido en un plan real del baseline (537 puntos):
+#         violaciones de los limites del URDF ......   0
+#         violaciones de los limites del pipeline ... 181
+#         peor caso: A4 = -180.059 deg, legal en [-185, 185], ilegal en
+#                    [-175, 175]
+#
+# COMO ACTUA
+#   moveit_ros.robot_model_loader lee
+#       <robot_description>_planning.joint_limits.<joint>.min_position
+#       <robot_description>_planning.joint_limits.<joint>.max_position
+#   y llama a moveit::core::JointModel::setVariableBounds(). Es decir, los
+#   limites pasan a ser los del MODELO: el muestreador de OMPL no puede
+#   siquiera generar un estado fuera de rango. No es un filtro posterior y no
+#   hace clamp de nada.
+#   VERIFICADO por desensamblado de libmoveit_robot_model_loader.so en el
+#   MoveIt 2.5.9 instalado.
+#
+# DESVIACION DECLARADA
+#   Las VELOCIDADES siguen derivadas mecanicamente del URDF.
+#   Las POSICIONES ya NO: proceden de la especificacion del pipeline de
+#   ejecucion. Ver kuka_kr6_moveit_baseline/kuka_pipeline_limits.py para la
+#   procedencia y su corroboracion.
+#
+# Se selecciona con:  enforce_pipeline_limits:=true   (por defecto)
+# La condicion sin limites reales sigue disponible con  :=false, que carga
+# joint_limits.yaml y reproduce el comportamiento original.
+# ─────────────────────────────────────────────────────────────────────────────
+joint_limits:
+  joint_a1:
+    has_position_limits: true
+    min_position: -2.792526803      # -160 deg   (URDF: -170)
+    max_position: 2.792526803      # 160 deg   (URDF: 170)
+    has_velocity_limits: true
+    max_velocity: 6.283185307179586
+    has_acceleration_limits: false
+  joint_a2:
+    has_position_limits: true
+    min_position: -3.141592654      # -180 deg   (URDF: -190)
+    max_position: 0.610865238      # 35 deg   (URDF: 45)
+    has_velocity_limits: true
+    max_velocity: 5.235987755982988
+    has_acceleration_limits: false
+  joint_a3:
+    has_position_limits: true
+    min_position: -1.919862177      # -110 deg   (URDF: -120)
+    max_position: 2.548180708      # 146 deg   (URDF: 156)
+    has_velocity_limits: true
+    max_velocity: 6.283185307179586
+    has_acceleration_limits: false
+  joint_a4:
+    has_position_limits: true
+    min_position: -3.054326191      # -175 deg   (URDF: -185)
+    max_position: 3.054326191      # 175 deg   (URDF: 185)
+    has_velocity_limits: true
+    max_velocity: 6.649704450098396
+    has_acceleration_limits: false
+  joint_a5:
+    has_position_limits: true
+    min_position: -1.919862177      # -110 deg   (URDF: -120)
+    max_position: 1.919862177      # 110 deg   (URDF: 120)
+    has_velocity_limits: true
+    max_velocity: 6.771877497737998
+    has_acceleration_limits: false
+  joint_a6:
+    has_position_limits: true
+    min_position: -5.934119457      # -340 deg   (URDF: -350)
+    max_position: 5.934119457      # 340 deg   (URDF: 350)
+    has_velocity_limits: true
+    max_velocity: 10.733774899765127
+    has_acceleration_limits: false

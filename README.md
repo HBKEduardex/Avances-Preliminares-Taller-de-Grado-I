@@ -365,6 +365,122 @@ previsualiza en RViz2.
 
 ---
 
+## 🧪 MoveIt2 en condición BASE (paquete `kuka_kr6_moveit_baseline`)
+
+Paquete **independiente** del sistema afinado: MoveIt2 con sus valores por
+defecto, sin ninguno de los ajustes del operador. Sirve para demostrar qué
+trayectorias genera el planificador «recién cargado» sobre **los mismos puntos
+enseñados**, y para guardarlas en JSON y compararlas con las afinadas.
+
+> [!IMPORTANT]
+> Esto **no** usa `kuka_kr6_moveit_config` ni los cuatro tópicos JSON del
+> contrato. Es un sistema aparte, con su propio MoveIt2, su propia RViz2 y su
+> propia GUI de pruebas. No lo mezcles con el flujo de la GUI externa.
+> `plan_only = True` siempre: **no mueve el robot y no puede ejecutar nada**.
+
+### Compilar
+
+```bash
+colcon build --packages-select kuka_kr6_moveit_baseline --symlink-install
+source install/setup.bash
+```
+
+### Lanzar con una tarea grabada
+
+```bash
+ros2 launch kuka_kr6_moveit_baseline baseline.launch.py \
+    input_json:=/root/taller1/trajectories/trajectory_sequence_20260822_193944.json
+```
+
+La tarea corta de 9 puntos, si prefieres una prueba más rápida:
+
+```bash
+ros2 launch kuka_kr6_moveit_baseline baseline.launch.py \
+    input_json:=/root/taller1/trajectories/trajectory_sequence_20260822_164132.json
+```
+
+Arranca RViz2 y una GUI de pruebas propia. En el panel **DEMOSTRACIÓN**:
+
+| Botón | Qué hace |
+|---|---|
+| `▶ PLANIFICAR CON BASELINE (cartesiano)` | Toma **solo** los puntos `P1..PN` del JSON, replanifica la tarea entera desde cero, la anima **y guarda el JSON automáticamente** |
+| `▶ ... (articular)` | Igual, pero con metas articulares |
+| `💾 GUARDAR ULTIMO PLAN (.json)` | Vuelve a guardar el mismo plan, sin replanificar |
+| `ver el JSON afinado (referencia)` | Reproduce la trayectoria afinada tal cual, como referencia |
+
+> [!NOTE]
+> Del JSON se usan **únicamente** los puntos enseñados `P1..PN`. Los waypoints
+> intermedios del sistema afinado **no se reutilizan**: reproducirlos no
+> demostraría nada sobre la condición base.
+
+### Condición experimental: 5 % PTP en todos los segmentos
+
+El JSON generado lleva `execution_profile.kuka_ptp_velocity_pct = 5.0` en
+**todos** los segmentos, sin heredar los perfiles 30/5 del archivo de entrada,
+para que la comparación contra el afinado no dependa de la velocidad. Las
+velocidades y tiempos de MoveIt se conservan **tal cual**: el 5 % es la
+velocidad de ejecución física, no un escalado de la trayectoria.
+
+Antes de guardar se ejecuta un **preflight offline** contra el contrato del
+pipeline (soft limits, `|Δq| ≤ 10°`, NaN/Inf, perfiles, eventos de garra). Si
+pasa, el archivo se llama `baseline_cartesiano_vel5_<fecha>.json`; si no, se
+guarda como `baseline_cartesiano_raw_<fecha>.json` marcado
+`RAW_NO_EJECUTABLE` con la causa. **Nunca se recorta ninguna articulación.**
+
+| Argumento del launch | Defecto | Qué controla |
+|---|---|---|
+| `kuka_ptp_velocity_pct` | `5.0` | Velocidad PTP escrita en todos los segmentos |
+| `demo_velocity_scaling` | `0.1593` | Densidad de muestreo. **Derivado**, no elegido: el valor más alto que aún cumple `Δq ≤ 10°` (cota 9.80°), es decir el ajuste mínimo necesario. No cambia la geometría del camino |
+| `enforce_pipeline_limits` | `true` | Carga `joint_limits_pipeline.yaml`: los soft limits reales pasan a ser los del **modelo**, así OMPL no puede muestrear fuera de rango. `false` reproduce la condición original |
+| `auto_save_plan` | `true` | Guardado automático al terminar de planificar |
+
+### Guardar el plan y compararlo
+
+El archivo va por defecto a `trajectories_baseline/` (hermano de
+`trajectories/`, nunca dentro). Se puede fijar con:
+
+```bash
+ros2 launch kuka_kr6_moveit_baseline baseline.launch.py \
+    input_json:=/root/taller1/trajectories/trajectory_sequence_20260822_193944.json \
+    baseline_output_dir:=/root/taller1/trajectories_baseline
+```
+
+El JSON generado es estructuralmente idéntico a uno válido, así que **también
+lo acepta la GUI externa** (`PROBAR TRAYECTORIA`). Comparación cuantitativa
+contra la trayectoria afinada:
+
+```bash
+python3 tools/compare_planned_trajectories.py \
+    --preliminary trajectories_baseline/baseline_cartesiano_<fecha>.json \
+    --tuned       trajectories/trajectory_sequence_20260822_193944.json \
+    --label-preliminary "BASELINE sin afinar" \
+    --label-tuned       "AFINADA" \
+    --output-dir  resultados_afinamiento/
+```
+
+Produce un PNG a 300 dpi (evolución de A1–A6 y Δq entre puntos consecutivos),
+un CSV de resumen, uno de detalle y un JSON de metadatos.
+
+> [!WARNING]
+> El archivo guardado es la **condición base regenerada** sobre los mismos
+> puntos, no una trayectoria preliminar histórica: ésa no quedó almacenada en
+> el repositorio. Redactarlo como «se recuperó la preliminar» sería falso.
+
+### Otros modos del launch
+
+| Argumento | Para qué |
+|---|---|
+| `analyze_json:=true` | Analiza el JSON sin planificar y escribe el CSV de continuidad |
+| `replan_json:=true` | Replanifica por consola, sin GUI |
+| `preview_json:=true` | Reproduce la secuencia grabada en RViz2 |
+| `use_gui:=false` | Sin GUI de pruebas |
+| `baseline_output_dir:=<ruta>` | Destino del botón GUARDAR |
+
+Documentación completa del paquete, incluida la guía de demostración del error
+de continuidad articular: `ros2_ws/src/kuka_kr6_moveit_baseline/README.md`.
+
+---
+
 ## 🎮 Seteo visual de puntos
 
 ### Caso A: crear nuevos puntos desde cero

@@ -35,6 +35,7 @@ from moveit_msgs.msg import (
     Constraints,
     JointConstraint,
     MotionPlanRequest,
+    MoveItErrorCodes,
     OrientationConstraint,
     PlanningOptions,
     PositionConstraint,
@@ -60,7 +61,8 @@ class PlanParams:
     def __init__(self, group='manipulator', base_frame='base_link',
                  tip_frame='tool0', planning_time=5.0, attempts=1,
                  vel_scale=1.0, acc_scale=1.0, joint_tol=1.0e-4,
-                 pos_tol=1.0e-4, ori_tol=1.0e-3, timeout=30.0):
+                 pos_tol=1.0e-4, ori_tol=1.0e-3, timeout=30.0,
+                 enforce_pipeline_limits=False):
         self.group = group
         self.base_frame = base_frame
         self.tip_frame = tip_frame
@@ -72,6 +74,10 @@ class PlanParams:
         self.pos_tol = pos_tol
         self.ori_tol = ori_tol
         self.timeout = timeout
+        # SOLO DOCUMENTAL: registra en el JSON con que condicion de limites
+        # se planifico. La restriccion real la impone el modelo, cargado desde
+        # config/joint_limits_pipeline.yaml por el launch.
+        self.enforce_pipeline_limits = enforce_pipeline_limits
 
 
 def matrix_to_quaternion(R) -> Tuple[float, float, float, float]:
@@ -96,6 +102,14 @@ def matrix_to_quaternion(R) -> Tuple[float, float, float, float]:
     return float(x), float(y), float(z), float(w)
 
 
+def error_name(value: int) -> str:
+    """Nombre simbolico de un MoveItErrorCodes. Sin esto solo se ve un -11."""
+    for name in dir(MoveItErrorCodes):
+        if name.isupper() and getattr(MoveItErrorCodes, name) == value:
+            return name
+    return 'DESCONOCIDO'
+
+
 def base_request(p: PlanParams) -> MotionPlanRequest:
     ws = WorkspaceParameters()
     ws.header.frame_id = p.base_frame
@@ -109,6 +123,12 @@ def base_request(p: PlanParams) -> MotionPlanRequest:
     req.allowed_planning_time = p.planning_time
     req.max_velocity_scaling_factor = p.vel_scale
     req.max_acceleration_scaling_factor = p.acc_scale
+    # NO se usan path_constraints. Los soft limits del pipeline se aplican al
+    # MODELO via config/joint_limits_pipeline.yaml (min_position/max_position),
+    # que moveit_ros.robot_model_loader entrega a
+    # moveit::core::JointModel::setVariableBounds(). Asi el muestreador de
+    # OMPL no puede generar un estado fuera de rango, en vez de generarlo y
+    # descartarlo despues.
     # pipeline_id y planner_id VACIOS: pipeline y planificador por defecto.
     return req
 
@@ -212,7 +232,13 @@ def plan_segment(action_client, start_rad: Sequence[float],
             return None
         time.sleep(0.02)
     handle = send_future.result()
-    if handle is None or not handle.accepted:
+    if handle is None:
+        if logger is not None:
+            logger('el servidor no devolvio manejador')
+        return None
+    if not handle.accepted:
+        if logger is not None:
+            logger('objetivo RECHAZADO por move_group')
         return None
 
     result_future = handle.get_result_async()
@@ -226,11 +252,14 @@ def plan_segment(action_client, start_rad: Sequence[float],
     result = wrapped.result
     if result.error_code.val != 1:      # 1 = SUCCESS
         if logger is not None:
-            logger(f'error_code = {result.error_code.val}')
+            code = result.error_code.val
+            logger(f'error_code {code} = {error_name(code)}')
         return None
 
     jt = result.planned_trajectory.joint_trajectory
     if not jt.points:
+        if logger is not None:
+            logger('el plan volvio SIN puntos')
         return None
 
     waypoints: List[Waypoint] = []
@@ -278,7 +307,11 @@ def plan_sequence(action_client, source_points_rad, segment_ids,
         goal = list(source_points_rad[k + 1])     # J-D2
         if progress is not None:
             progress(k, len(segment_ids), sid, None)
-        wps = plan_segment(action_client, current, goal, cartesian, p)
+        # El motivo del fallo se CAPTURA y se propaga. Antes se descartaba y
+        # el operador solo veia 'NO RESUELTO', sin saber por que.
+        reasons: List[str] = []
+        wps = plan_segment(action_client, current, goal, cartesian, p,
+                           logger=reasons.append)
         if wps is None:
             failed.append(sid)
             groups.append([])
@@ -287,7 +320,8 @@ def plan_sequence(action_client, source_points_rad, segment_ids,
             # teorica, un estado en el que el baseline nunca estuvo.
             current = list(goal)
             if progress is not None:
-                progress(k, len(segment_ids), sid, 'NO RESUELTO')
+                why = reasons[0] if reasons else 'sin respuesta o tiempo agotado'
+                progress(k, len(segment_ids), sid, f'NO RESUELTO — {why}')
             continue
         if broken:
             rebuilt.append(sid)

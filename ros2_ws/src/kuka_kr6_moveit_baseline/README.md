@@ -737,6 +737,106 @@ HOME singular (`A5 ≈ 0`) a `A5 ≈ 90`. En la trayectoria grabada:
 
 ---
 
+### 7.4 Guardar el plan del baseline en JSON — la condición base como archivo
+
+`PLANIFICAR CON BASELINE` genera el plan, lo anima en RViz y **lo guarda
+automáticamente** con el mismo contrato `schema_version: 1` que produce el
+sistema afinado. `GUARDAR ULTIMO PLAN` repite el guardado a mano si hace falta.
+
+```
+▶ PLANIFICAR CON BASELINE (cartesiano)  ← planifica, anima Y guarda
+💾 GUARDAR ULTIMO PLAN (.json)          ← vuelve a guardar el mismo plan
+```
+
+**El guardado no replanifica.** Serializa el mismo objeto que se acaba de
+animar: no vuelve a llamar a `/move_action`, no recalcula IK, no regenera
+puntos.
+
+#### Condición experimental: 5 % PTP uniforme
+
+Todos los segmentos se escriben con `execution_profile.kuka_ptp_velocity_pct
+= 5.0`, **sin heredar** los perfiles 30/5 del JSON de entrada. Es una
+condición de **ejecución física**, para que ninguna diferencia entre baseline
+y afinado pueda atribuirse a la velocidad.
+
+> No confundir con las velocidades de MoveIt. `velocities_rad_s`,
+> `accelerations_rad_s2` y `time_from_start_sec` conservan el resultado **real**
+> del planificador: no se multiplican por 0.05, no se ponen a cero y no se
+> recalculan.
+
+#### Preflight y separación RAW / ejecutable
+
+```
+plan en memoria
+  └─ documento JSON
+       └─ preflight offline contra el contrato KUKA
+            ├─ OK     → baseline_cartesiano_vel5_<fecha>.json
+            └─ FALLA  → baseline_cartesiano_raw_<fecha>.json
+                        schema_status: RAW_NO_EJECUTABLE, con la causa exacta
+```
+
+El preflight comprueba soft limits, `|Δq| ≤ 10°` intra-segmento y en uniones,
+NaN/Inf, monotonía temporal, `joint_names`, eventos de garra y el 5 % en todos
+los segmentos. **Nunca hace clamp**: un punto fuera de límites marca el
+archivo como no ejecutable, no se recorta su valor.
+
+**Destino.** El campo `guardar en` del panel, o el argumento de launch
+`baseline_output_dir`. Vacío ⇒ se deriva del JSON de entrada: con
+`/root/taller1/trajectories/x.json` el destino es
+`/root/taller1/trajectories_baseline`. **Nunca** la carpeta del JSON de origen
+(prohibición J.0); si se intenta, se aborta. Tampoco se sobrescribe ningún
+archivo previo.
+
+**Regla estructural.** Todo campo que describe la **tarea** se espeja del JSON
+de entrada; sólo `trajectory_points` es contenido nuevo. Así el archivo es
+estructuralmente indistinguible de uno válido y lo aceptan los mismos
+consumidores, **incluida la GUI externa por TCP/IP**.
+
+| Campo | Origen | Nota |
+|---|---|---|
+| `source_points` | **espejado** del JSON de entrada | misma tarea, mismas metas |
+| `gripper` | **espejado** | el baseline no controla el gripper |
+| `segments[k].from_point` / `.to_point` | **espejado** | |
+| `segments[k].execution_profile` | **forzado a 5.0** | `kuka_ptp_velocity_pct = 5.0` en todos los segmentos, sin excepción y sin heredar del origen |
+| `source_points[k].incoming_kuka_ptp_velocity_pct` | **forzado a 5.0** | sólo donde el esquema de origen ya lo traía; crearlo donde no existe sería inventar estructura |
+| `planner_metadata` | los `PlanParams` efectivos | exactamente las 10 claves del contrato original |
+| `trajectory_points` | lo que devolvió `/move_action` | no se recalcula ni se interpola |
+| `positions_deg` | `math.degrees(positions_rad)` | la verificación cruzada del lector cierra en `0.000e+00` |
+| `velocities_rad_s` / `accelerations_rad_s2` | tal cual del planificador | lista vacía si no las entregó, **nunca ceros inventados** |
+| `source` | fijo | `kuka_kr6_moveit_baseline/BASELINE_SIN_AFINAR` |
+| `baseline_metadata` | **única** clave fuera del contrato | `condition`, `schema_status`, `input_md5`, `goal_variant`, `failed_segments`, `experimental_velocity_condition.fields_set` (lista exacta de lo fijado a 5 %) |
+
+> ⚠️ **No añadas campos sueltos a este archivo.** Lo consume un validador
+> externo que no está en este repositorio. Escribir `execution_profile: {}`
+> (clave presente pero vacía) lo hace fallar con
+> `kuka_ptp_velocity_pct debe ser mayor que 0 y menor o igual que 100`.
+> Toda metainformación nueva va dentro de `baseline_metadata`.
+
+**Planes incompletos.** Si algún segmento no se resuelve, el archivo se
+escribe igual (es dato del estudio) con `trajectory_points: []` en ese
+segmento y `schema_status: INCOMPLETO`. El lector estricto lo **rechazará**, y
+debe hacerlo: una comparación exige un plan completo. El mensaje del botón lo
+advierte.
+
+**Cierre del ciclo.** Con el archivo guardado, la comparación cuantitativa:
+
+```bash
+python3 tools/compare_planned_trajectories.py \
+    --preliminary trajectories_baseline/baseline_cartesiano_<fecha>.json \
+    --tuned       trajectories/trajectory_sequence_20260822_193944.json \
+    --label-preliminary "BASELINE sin afinar" \
+    --label-tuned       "AFINADA" \
+    --output-dir  resultados_afinamiento/
+```
+
+> ⚠️ **Qué se puede afirmar con este archivo.** Es la **condición base
+> regenerada** con los mismos puntos enseñados, no la trayectoria preliminar
+> histórica: ésa no quedó almacenada en el repositorio. Redactarlo como «se
+> recuperó la trayectoria preliminar» sería falso. Lo correcto es «se regeneró
+> la condición base con MoveIt2 por defecto sobre los mismos puntos».
+
+---
+
 ## 8. Cómo interpretar el CSV
 
 Un archivo por trayectoria, en `analysis_output/`:

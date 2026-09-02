@@ -1,0 +1,252 @@
+{
+  "mode": "three_conditions",
+  "data_nature": "Datos articulares de trayectorias PLANIFICADAS por MoveIt2. No son telemetria fisica del robot.",
+  "joint_limits_source": "/home/eduardex/Documents/taller1/ros2_ws/src/kuka_kr6_support/urdf/kr6r900sixx_macro.xacro",
+  "joint_limits_deg": {
+    "A1": [
+      -170.0,
+      170.0
+    ],
+    "A2": [
+      -190.0,
+      45.0
+    ],
+    "A3": [
+      -119.99999999999999,
+      156.0
+    ],
+    "A4": [
+      -185.0,
+      185.0
+    ],
+    "A5": [
+      -119.99999999999999,
+      119.99999999999999
+    ],
+    "A6": [
+      -350.0,
+      350.0
+    ]
+  },
+  "raw": {
+    "path": "/home/eduardex/Documents/taller1/trajectories_baseline/baseline_cartesiano_20260902_064321.json",
+    "n_points": 435,
+    "label": "MoveIt2 Base RAW",
+    "format": "JSON contrato schema_version 1",
+    "units": "positions_rad (radianes) -> convertido a grados; verificacion cruzada contra positions_deg superada",
+    "extra": {
+      "md5": "3560b2ba2cbf25ac5ce6f2b648fae692",
+      "source": "kuka_kr6_moveit_baseline/BASELINE_SIN_AFINAR",
+      "generated_at": "2026-09-02T06:43:21",
+      "n_source_points": 15,
+      "n_segments": 14,
+      "n_segments_in_file": 14,
+      "segments_used": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8",
+        "T9",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14"
+      ],
+      "source_point_ids": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7",
+        "P8",
+        "P9",
+        "P10",
+        "P11",
+        "P12",
+        "P13",
+        "P14",
+        "P15"
+      ],
+      "gripper_events": 4,
+      "planner_metadata": {
+        "planning_pipeline": "",
+        "planner_id": "",
+        "group": "manipulator",
+        "plan_only": true,
+        "velocity_scaling": 1.0,
+        "acceleration_scaling": 1.0,
+        "planning_attempts": 1,
+        "allowed_planning_time_sec": 5.0,
+        "joint_goal_tolerance_rad": 0.0001,
+        "segment_chaining": "previous_trajectory_end"
+      },
+      "checks": [
+        "schema_version = 1 (soportada)",
+        "joint_names coinciden con el orden canonico (6)",
+        "source_points: 15, todos con 6 componentes",
+        "segmentos: 14 = source_points - 1 (coherente)",
+        "verificacion cruzada rad/deg: peor caso 0.000e+00 deg (tolerancia 1.0e-09) — SUPERADA",
+        "waypoints totales: 435, todos con 6 componentes",
+        "limites del URDF baseline: 0 violaciones"
+      ]
+    }
+  },
+  "restricted": {
+    "path": "/home/eduardex/Documents/taller1/trajectories_baseline/baseline_cartesiano_vel5_20260902_074046.json",
+    "n_points": 311,
+    "label": "MoveIt2 Base restringido",
+    "format": "JSON contrato schema_version 1",
+    "units": "positions_rad (radianes) -> convertido a grados; verificacion cruzada contra positions_deg superada",
+    "extra": {
+      "md5": "46b589cf003698d066d909df9710ce10",
+      "source": "kuka_kr6_moveit_baseline/BASELINE_SIN_AFINAR",
+      "generated_at": "2026-09-02T07:40:46",
+      "n_source_points": 15,
+      "n_segments": 14,
+      "n_segments_in_file": 14,
+      "segments_used": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8",
+        "T9",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14"
+      ],
+      "source_point_ids": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7",
+        "P8",
+        "P9",
+        "P10",
+        "P11",
+        "P12",
+        "P13",
+        "P14",
+        "P15"
+      ],
+      "gripper_events": 4,
+      "planner_metadata": {
+        "planning_pipeline": "",
+        "planner_id": "",
+        "group": "manipulator",
+        "plan_only": true,
+        "velocity_scaling": 0.1301,
+        "acceleration_scaling": 1.0,
+        "planning_attempts": 1,
+        "allowed_planning_time_sec": 5.0,
+        "joint_goal_tolerance_rad": 0.0001,
+        "segment_chaining": "previous_trajectory_end"
+      },
+      "checks": [
+        "schema_version = 1 (soportada)",
+        "joint_names coinciden con el orden canonico (6)",
+        "source_points: 15, todos con 6 componentes",
+        "segmentos: 14 = source_points - 1 (coherente)",
+        "verificacion cruzada rad/deg: peor caso 0.000e+00 deg (tolerancia 1.0e-09) — SUPERADA",
+        "waypoints totales: 311, todos con 6 componentes",
+        "limites del URDF baseline: 0 violaciones"
+      ]
+    }
+  },
+  "tuned": {
+    "path": "/home/eduardex/Documents/taller1/trajectories/trajectory_sequence_20260822_193944.json",
+    "n_points": 199,
+    "label": "MoveIt2 Afinado",
+    "format": "JSON contrato schema_version 1",
+    "units": "positions_rad (radianes) -> convertido a grados; verificacion cruzada contra positions_deg superada",
+    "extra": {
+      "md5": "004e00cae63b093444a5957dac09a175",
+      "source": "kuka_gui_control",
+      "generated_at": "2026-08-22T19:39:44",
+      "n_source_points": 15,
+      "n_segments": 14,
+      "n_segments_in_file": 14,
+      "segments_used": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8",
+        "T9",
+        "T10",
+        "T11",
+        "T12",
+        "T13",
+        "T14"
+      ],
+      "source_point_ids": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7",
+        "P8",
+        "P9",
+        "P10",
+        "P11",
+        "P12",
+        "P13",
+        "P14",
+        "P15"
+      ],
+      "gripper_events": 4,
+      "planner_metadata": {
+        "planning_pipeline": "",
+        "planner_id": "",
+        "group": "manipulator",
+        "plan_only": true,
+        "velocity_scaling": 0.1,
+        "acceleration_scaling": 0.1,
+        "planning_attempts": 10,
+        "allowed_planning_time_sec": 10.0,
+        "joint_goal_tolerance_rad": 0.003490658503988659,
+        "segment_chaining": "previous_trajectory_end"
+      },
+      "checks": [
+        "schema_version = 1 (soportada)",
+        "joint_names coinciden con el orden canonico (6)",
+        "source_points: 15, todos con 6 componentes",
+        "segmentos: 14 = source_points - 1 (coherente)",
+        "verificacion cruzada rad/deg: peor caso 0.000e+00 deg (tolerancia 1.0e-09) — SUPERADA",
+        "waypoints totales: 199, todos con 6 componentes",
+        "limites del URDF baseline: 0 violaciones"
+      ]
+    }
+  },
+  "stage_semantics": {
+    "raw_to_restricted": "aplicacion de restricciones de ejecutabilidad. NO es el afinamiento.",
+    "restricted_to_tuned": "etapa de afinamiento.",
+    "raw_to_tuned": "evolucion global, separada de las dos etapas."
+  },
+  "outputs": {
+    "png": "/home/eduardex/Documents/taller1/resultados_evolucion/comparacion_global_raw_restringido_afinado_articular.png",
+    "summary_csv": "/home/eduardex/Documents/taller1/resultados_evolucion/comparacion_global_resumen.csv",
+    "detail_csv": "/home/eduardex/Documents/taller1/resultados_evolucion/comparacion_global_detalle.csv",
+    "evolution_csv": "/home/eduardex/Documents/taller1/resultados_evolucion/comparacion_global_evolucion.csv"
+  }
+}

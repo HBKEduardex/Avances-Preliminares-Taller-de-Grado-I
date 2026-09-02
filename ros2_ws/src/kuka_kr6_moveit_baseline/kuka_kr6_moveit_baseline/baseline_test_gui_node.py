@@ -48,6 +48,7 @@ SEGURIDAD
 """
 
 import math
+import os
 import queue
 import threading
 import tkinter as tk
@@ -86,6 +87,16 @@ from .json_preview_node import (
 from .replan_core import PlanParams, plan_sequence
 from .trajectory_json_reader import JsonTrajectoryError
 from .trajectory_json_reader import load as load_json_sequence
+from .trajectory_json_writer import (
+    JsonTrajectoryWriteError,
+    build_baseline_document,
+    write_baseline_sequence,
+)
+from .baseline_preflight import format_report, preflight_document
+from .kuka_pipeline_limits import (
+    EXPERIMENTAL_PTP_VELOCITY_PCT,
+    contract_velocity_scaling,
+)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Constantes
@@ -181,6 +192,29 @@ class BaselineTestGuiNode(Node):
         #    accion que no sea /move_action, ni ningun topico de ejecucion.
         self.declare_parameter('preview_json', '')
         self.declare_parameter('preview_topic', '/display_planned_path')
+        # ── Guardado del plan del BASELINE (boton GUARDAR ULTIMO PLAN).
+        #    Vacio = se deriva del JSON de entrada:
+        #    <padre-del-json>/trajectories_baseline. Nunca se escribe
+        #    junto al JSON de origen (prohibicion J.0).
+        self.declare_parameter('baseline_output_dir', '')
+        # ── CONDICIONES DE LA DEMOSTRACION ──────────────────────────
+        # Escalado de velocidad del panel DEMOSTRACION. NO cambia la
+        # geometria del camino: TOTG lo aplica DESPUES de que OMPL haya
+        # decidido el camino, asi que solo altera la parametrizacion temporal
+        # y, con ella, la densidad de muestreo. El defecto es el escalado MAS
+        # ALTO que sigue cumpliendo el contrato de 10 deg: el ajuste MINIMO
+        # necesario. Apretarlo mas acercaria el baseline a la densidad del
+        # sistema afinado (0.1) sin que el contrato lo exija.
+        # Ver kuka_pipeline_limits.DELTA_LAW.
+        self.declare_parameter(
+            'demo_velocity_scaling', round(contract_velocity_scaling(), 4))
+        # Informar a MoveIt de los soft limits REALES durante la planificacion.
+        self.declare_parameter('enforce_pipeline_limits', True)
+        # Guardado automatico al terminar de planificar (variante cartesiana).
+        self.declare_parameter('auto_save_plan', True)
+        # Condicion experimental de velocidad fisica PTP.
+        self.declare_parameter(
+            'kuka_ptp_velocity_pct', EXPERIMENTAL_PTP_VELOCITY_PCT)
         # ── Parametros de planificacion: DEFECTOS de MoveIt2 ────────────
         # Todos NO VERIFICADO (no hay plantilla local). Ver README seccion 2.
         self.declare_parameter('allowed_planning_time', 5.0)
@@ -197,6 +231,12 @@ class BaselineTestGuiNode(Node):
         self.tip_frame = gp('tip_frame').value
         self.preview_json = str(gp('preview_json').value or '').strip()
         self._preview_topic = str(gp('preview_topic').value)
+        self.baseline_output_dir = str(
+            gp('baseline_output_dir').value or '').strip()
+        self._demo_vel_scaling = float(gp('demo_velocity_scaling').value)
+        self._enforce_limits = bool(gp('enforce_pipeline_limits').value)
+        self.auto_save_plan = bool(gp('auto_save_plan').value)
+        self.ptp_velocity_pct = float(gp('kuka_ptp_velocity_pct').value)
         self._action_name = gp('move_action_name').value
         self._planning_time = float(gp('allowed_planning_time').value)
         self._attempts = int(gp('num_planning_attempts').value)
@@ -222,6 +262,9 @@ class BaselineTestGuiNode(Node):
         self._preview_publisher = self.create_publisher(
             DisplayTrajectory, self._preview_topic, preview_qos())
         self._preview_cache = {}
+        # Ultimo plan del baseline, EN MEMORIA, esperando a guardarse.
+        # No se escribe nada en disco hasta que el operador lo pide.
+        self._last_plan = None
 
         # UNICO cliente de accion del nodo: planificacion.
         self._action_client = ActionClient(self, MoveGroup, self._action_name)
@@ -383,17 +426,35 @@ class BaselineTestGuiNode(Node):
         if not self._action_client.wait_for_server(timeout_sec=10.0):
             return False, f'{self._action_name} no disponible. ¿Esta move_group?'
 
+        # El escalado de velocidad de la DEMOSTRACION sustituye al 1.0 por
+        # defecto SOLO para fijar la densidad de muestreo. La aceleracion, el
+        # planificador, los adaptadores y las tolerancias siguen siendo los de
+        # la condicion base.
         params = PlanParams(
             group=self.group, base_frame=self.base_frame,
             tip_frame=self.tip_frame, planning_time=self._planning_time,
-            attempts=self._attempts, vel_scale=self._vel_scale,
+            attempts=self._attempts, vel_scale=self._demo_vel_scaling,
             acc_scale=self._acc_scale, joint_tol=self._joint_tol,
-            pos_tol=self._pos_tol, ori_tol=self._ori_tol)
+            pos_tol=self._pos_tol, ori_tol=self._ori_tol,
+            enforce_pipeline_limits=self._enforce_limits)
 
         ids = [seg.id for seg in sequence.segments]
         groups, failed, rebuilt = plan_sequence(
             self._action_client, sequence.source_points_rad, ids,
             cartesian, params, progress=progress)
+
+        # El plan queda retenido ANTES de animarlo: si la animacion falla,
+        # el plan sigue siendo el dato del estudio y no debe perderse.
+        self._last_plan = {
+            'sequence': sequence,
+            'groups': groups,
+            'segment_ids': list(ids),
+            'failed': list(failed),
+            'rebuilt': list(rebuilt),
+            'params': params,
+            'cartesian': cartesian,
+            'planned_at': datetime.now(),
+        }
 
         try:
             display, n_points, total, used = build_display_from_groups(
@@ -407,14 +468,104 @@ class BaselineTestGuiNode(Node):
         if failed:
             detalle = (f'  |  NO RESUELTOS: {failed}  |  '
                        f'CADENA RECONSTRUIDA en: {rebuilt}')
-        return True, (
+        message = (
             f'PLAN DEL BASELINE (variante {variante}) publicado: '
             f'{used}/{len(ids)} segmentos, {n_points} waypoints, '
             f'{total:.2f} s a {time_scale:.1f}x.{detalle}')
 
+        # ── GUARDADO AUTOMATICO ─────────────────────────────────────
+        # Serializa el plan que se ACABA de generar. No replanifica, no
+        # recalcula IK y no regenera puntos: usa el mismo _last_plan.
+        if self.auto_save_plan:
+            saved_ok, saved_message = self.save_last_plan()
+            message = f'{message}\n{saved_message}'
+            if not saved_ok:
+                return False, message
+        return True, message
+
     def clear_preview(self):
         """Publica una trayectoria vacia para limpiar la animacion."""
         self._preview_publisher.publish(DisplayTrajectory())
+
+    def default_output_dir(self) -> str:
+        """
+        Destino por defecto del plan guardado.
+
+        Se deriva del JSON de entrada: hermano de su carpeta, nunca la carpeta
+        misma. Con /root/taller1/trajectories/x.json el destino es
+        /root/taller1/trajectories_baseline (prohibicion J.0).
+        """
+        if self.baseline_output_dir:
+            return self.baseline_output_dir
+        reference = self.preview_json
+        if self._last_plan is not None:
+            reference = self._last_plan['sequence'].path
+        if not reference:
+            return os.path.abspath('trajectories_baseline')
+        source_dir = os.path.dirname(os.path.abspath(reference))
+        return os.path.join(
+            os.path.dirname(source_dir), 'trajectories_baseline')
+
+    def save_last_plan(self, out_dir: str = ''):
+        """
+        Serializa el ULTIMO plan del baseline y lo valida offline.
+
+        FLUJO (seccion 28 del encargo):
+
+            plan en memoria
+                -> documento JSON (misma RobotTrajectory, sin replanificar)
+                -> preflight offline contra el contrato KUKA
+                     |- OK      -> baseline_cartesiano_vel5_<fecha>.json
+                     |- FALLA   -> baseline_cartesiano_raw_<fecha>.json
+                                   marcado RAW_NO_EJECUTABLE, con la causa
+
+        NO replanifica. NO recalcula IK. NO regenera puntos. NO hace clamp de
+        ninguna articulacion: un punto fuera de limites hace que el archivo se
+        marque como no ejecutable, no que se le recorte el valor.
+        """
+        plan = self._last_plan
+        if plan is None:
+            return False, ('No hay ningun plan del baseline en memoria. '
+                           'Pulsa antes PLANIFICAR CON BASELINE.')
+
+        target = (out_dir or '').strip() or self.default_output_dir()
+        try:
+            document = build_baseline_document(
+                plan['sequence'], plan['groups'], plan['segment_ids'],
+                plan['failed'], plan['rebuilt'], plan['params'],
+                plan['cartesian'], planned_at=plan['planned_at'],
+                ptp_velocity_pct=self.ptp_velocity_pct)
+        except (JsonTrajectoryWriteError, OSError, ValueError) as exc:
+            return False, f'No se pudo construir el JSON: {exc}'
+
+        result = preflight_document(document, self.ptp_velocity_pct)
+
+        try:
+            path = write_baseline_sequence(
+                target, plan['sequence'], plan['groups'],
+                plan['segment_ids'], plan['failed'], plan['rebuilt'],
+                plan['params'], plan['cartesian'],
+                planned_at=plan['planned_at'],
+                ptp_velocity_pct=self.ptp_velocity_pct,
+                executable=result.ok, document=document)
+        except (JsonTrajectoryWriteError, OSError, ValueError) as exc:
+            return False, f'No se pudo guardar el plan: {exc}'
+
+        report = format_report(result, path)
+        for line in report.splitlines():
+            self.status_queue.put(('log', line))
+
+        total = sum(len(g) for g in plan['groups'])
+        variante = 'cartesiano' if plan['cartesian'] else 'articular'
+        if result.ok:
+            return True, (
+                f'JSON BASELINE EJECUTABLE ({variante}): {path}  |  '
+                f'{len(plan["segment_ids"])} segmentos, {total} waypoints, '
+                f'PTP {self.ptp_velocity_pct:g}% en todos los segmentos.')
+        return False, (
+            f'JSON GUARDADO COMO RAW, NO EJECUTABLE: {path}  |  '
+            f'{len(result.errors)} incumplimientos del contrato KUKA. '
+            f'Causa: {result.errors[0]}')
 
     def _send(self, request: MotionPlanRequest, kind: str):
         with self._busy_lock:
@@ -625,6 +776,30 @@ class BaselineTestGui:
                      self._play_recorded, '#7f8c8d')
         self._button(buttons2, 'LIMPIAR', self._clear_preview, '#7f8c8d')
 
+        # ── Guardado del plan recien generado ────────────────────────
+        row3 = tk.Frame(frame, bg=BG_PANEL)
+        row3.pack(fill='x', padx=6, pady=(0, 2))
+        tk.Label(row3, text='guardar en', bg=BG_PANEL, fg='#7fb3d5',
+                 font=('DejaVu Sans Mono', 9, 'bold')).pack(side='left')
+        self._save_dir = tk.Entry(
+            row3, font=('DejaVu Sans Mono', 9), bg='#101820', fg=FG_TEXT,
+            insertbackground='white')
+        self._save_dir.pack(side='left', fill='x', expand=True, padx=6)
+        self._save_dir.insert(0, self.node.default_output_dir())
+
+        buttons3 = tk.Frame(frame, bg=BG_PANEL)
+        buttons3.pack(pady=(0, 6))
+        self._btn_save = self._button(
+            buttons3, '\U0001f4be  GUARDAR ULTIMO PLAN (.json)',
+            self._save_last_plan, '#2980b9')
+        tk.Label(
+            frame,
+            text=('El archivo guardado usa el MISMO contrato que el JSON '
+                  'afinado, marcado como BASELINE_SIN_AFINAR, y es la entrada '
+                  'de tools/compare_planned_trajectories.py.'),
+            bg=BG_PANEL, fg='#bdc3c7', wraplength=560, justify='left',
+            font=('DejaVu Sans', 8)).pack(anchor='w', padx=8, pady=(0, 4))
+
     # ── acciones del panel ───────────────────────────────────────────
 
     def _preview_inputs(self):
@@ -695,6 +870,17 @@ class BaselineTestGui:
         if ok:
             self._log('OJO: esto es la trayectoria del sistema AFINADO, no del '
                       'baseline. Es la referencia, no la condicion a demostrar.')
+
+    def _save_last_plan(self):
+        """Escribe el ultimo plan del baseline. No replanifica nada."""
+        if self._replanning:
+            self._log('Espera a que termine la planificacion.', 'warn')
+            return
+        ok, message = self.node.save_last_plan(self._save_dir.get())
+        self._log(message, 'info' if ok else 'error')
+        if ok:
+            self._log('Este archivo es la CONDICION BASE REGENERADA con los '
+                      'mismos puntos, no la trayectoria preliminar historica.')
 
     def _clear_preview(self):
         self.node.clear_preview()
