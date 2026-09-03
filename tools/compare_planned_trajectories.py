@@ -341,13 +341,22 @@ STYLE = {
                    'alpha': 0.90},
     'tuned3': {'color': '#1f4e79', 'linestyle': '-', 'linewidth': 1.8,
                'alpha': 0.95},
+    # ── KRL (ejecucion registrada) frente a MoveIt2 afinado (planificado) ─
+    # Los usa tools/compare_krl_moveit_trajectories.py. Viven aqui para que
+    # las dos familias de figuras compartan identidad visual.
+    'krl': {'color': '#c0392b', 'linestyle': '--', 'linewidth': 1.7,
+            'alpha': 0.92},
+    'moveit_tuned': {'color': '#1f4e79', 'linestyle': '-', 'linewidth': 1.8,
+                     'alpha': 0.95},
 }
 
 
 def make_figure(trajs: List[Tuple[Trajectory, str]],
                 limits: Optional[List[Tuple[float, float]]],
                 out_png: str, dpi: int = 300,
-                title: Optional[str] = None) -> str:
+                title: Optional[str] = None,
+                footer: Optional[str] = None,
+                panel_b_label: Optional[str] = None) -> str:
     """
     Figura de N condiciones. `trajs` es [(trayectoria, clave_de_estilo), ...].
 
@@ -373,7 +382,7 @@ def make_figure(trajs: List[Tuple[Trajectory, str]],
     top = 0.895 if three else 0.885
     # El pie del modo de tres condiciones ocupa cuatro lineas: necesita mas
     # margen inferior o la ultima queda cortada por el borde de la figura.
-    bottom = 0.105 if three else 0.085
+    bottom = 0.105 if (three or footer is not None) else 0.085
     gs = GridSpec(4, 3, figure=fig, hspace=0.62, wspace=0.30,
                   top=top, bottom=bottom, left=0.075, right=0.985)
 
@@ -413,9 +422,15 @@ def make_figure(trajs: List[Tuple[Trajectory, str]],
             ax.legend(loc='best', framealpha=0.92,
                       fontsize=8.5 if three else 10)
 
-    fig.text(0.075, label_b,
-             '(b)  Variación articular entre puntos consecutivos de la '
-             'trayectoria planificada,  Δqᵢ(k) = |qᵢ(k) − qᵢ(k−1)| [°]',
+    # El rotulo por defecto dice "trayectoria planificada" porque en esta
+    # herramienta las dos curvas SON planificadas. Cuando una de las fuentes
+    # es una ejecucion registrada, quien llama debe pasar otro rotulo: dejar
+    # el de por defecto afirmaria algo falso sobre la procedencia del dato.
+    if panel_b_label is None:
+        panel_b_label = ('(b)  Variación articular entre puntos consecutivos '
+                         'de la trayectoria planificada,  '
+                         'Δqᵢ(k) = |qᵢ(k) − qᵢ(k−1)| [°]')
+    fig.text(0.075, label_b, panel_b_label,
              fontsize=12, fontweight='bold', ha='left')
 
     for j, axis in enumerate(AXES):
@@ -434,7 +449,9 @@ def make_figure(trajs: List[Tuple[Trajectory, str]],
 
     # El pie se parte en lineas cortas a proposito: con las etiquetas largas
     # del modo de tres condiciones, una sola linea se sale de la figura.
-    if three:
+    if footer is not None:
+        pass
+    elif three:
         counts = '   '.join(f'N({t.label}) = {t.n}' for t, _ in trajs)
         footer = (
             'Datos articulares de trayectorias PLANIFICADAS por MoveIt2. '
@@ -452,8 +469,11 @@ def make_figure(trajs: List[Tuple[Trajectory, str]],
             'El eje horizontal es el progreso discreto normalizado de los '
             f'puntos almacenados ({counts}); NO representa tiempo. '
             'Δq depende de la discretización.')
-    fig.text(0.5, 0.062 if three else 0.030, footer, ha='center', va='top',
-             fontsize=10, style='italic', color='#444444')
+    # 2 lineas -> 0.030 (modo de dos condiciones). 4 lineas -> 0.062 (modo de
+    # tres). La formula reproduce EXACTAMENTE las dos posiciones anteriores.
+    lines = footer.count('\n') + 1
+    fig.text(0.5, 0.030 + 0.016 * max(0, lines - 2), footer, ha='center',
+             va='top', fontsize=10, style='italic', color='#444444')
 
     os.makedirs(os.path.dirname(out_png) or '.', exist_ok=True)
     fig.savefig(out_png, dpi=dpi)

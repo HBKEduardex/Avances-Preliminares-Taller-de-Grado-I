@@ -249,6 +249,12 @@ def build_baseline_document(sequence, groups: Sequence[Sequence[Any]],
             'planned_by': '/move_action (move_group), plan_only=True',
             'base_frame': getattr(params, 'base_frame', ''),
             'tip_frame': getattr(params, 'tip_frame', ''),
+            # Distingue RAW de RESTRINGIDO desde el propio archivo. Sin esto
+            # las dos condiciones solo se diferencian contando violaciones,
+            # que es justo lo que se quiere medir y no lo que se debe usar
+            # para etiquetar.
+            'pipeline_limits_enforced': bool(
+                getattr(params, 'enforce_pipeline_limits', False)),
             'position_tolerance_m': getattr(params, 'pos_tol', None),
             'orientation_tolerance_rad': getattr(params, 'ori_tol', None),
             'failed_segments': list(failed),

@@ -837,6 +837,151 @@ python3 tools/compare_planned_trajectories.py \
 
 ---
 
+### 7.5 Procedimiento completo — generar las tres condiciones de una tarea
+
+Para cada tarea se generan **dos** archivos con el baseline (RAW y restringido)
+y se comparan contra el JSON **afinado**, que ya existe.
+
+**Recompila primero** si has tocado el paquete:
+
+```bash
+colcon build --packages-select kuka_kr6_moveit_baseline --symlink-install
+source install/setup.bash
+```
+
+#### Tarea 1 — CUADRADO FINAL
+
+**Paso 1: condición RAW**
+
+```bash
+ros2 launch kuka_kr6_moveit_baseline baseline.launch.py \
+    "input_json:=/root/taller1/trajectories/CUADRADO FINAL.json" \
+    enforce_pipeline_limits:=false \
+    demo_velocity_scaling:=1.0 \
+    baseline_output_dir:=/root/taller1/trajectories_baseline/cuadrado_raw
+```
+
+En la GUI: `▶ PLANIFICAR CON BASELINE (cartesiano)`. Guarda solo. Cierra con
+Ctrl+C.
+
+Esperado: el preflight **rechaza** y el archivo sale como
+`baseline_cartesiano_raw_<fecha>.json`. Eso es correcto — es la condición que
+no respeta los límites.
+
+**Paso 2: condición RESTRINGIDA**
+
+```bash
+ros2 launch kuka_kr6_moveit_baseline baseline.launch.py \
+    "input_json:=/root/taller1/trajectories/CUADRADO FINAL.json" \
+    baseline_output_dir:=/root/taller1/trajectories_baseline/cuadrado_restringido
+```
+
+Mismo botón. Aquí el preflight debe salir **OK** y el archivo
+`baseline_cartesiano_vel5_<fecha>.json`.
+
+**Paso 3: comparar**
+
+```bash
+cd /root/taller1
+python3 tools/compare_planned_trajectories.py \
+    --raw        "$(ls -t trajectories_baseline/cuadrado_raw/*.json | head -1)" \
+    --restricted "$(ls -t trajectories_baseline/cuadrado_restringido/*.json | head -1)" \
+    --tuned      "trajectories/CUADRADO FINAL.json" \
+    --label-raw        "MoveIt2 Base RAW" \
+    --label-restricted "MoveIt2 Base restringido" \
+    --label-tuned      "MoveIt2 Afinado" \
+    --output-dir resultados_evolucion_cuadrado/
+```
+
+#### Tarea 2 — PAP
+
+Idéntico, cambiando rutas:
+
+```bash
+# RAW
+ros2 launch kuka_kr6_moveit_baseline baseline.launch.py \
+    input_json:=/root/taller1/trajectories/PAP.json \
+    enforce_pipeline_limits:=false demo_velocity_scaling:=1.0 \
+    baseline_output_dir:=/root/taller1/trajectories_baseline/pap_raw
+
+# RESTRINGIDO
+ros2 launch kuka_kr6_moveit_baseline baseline.launch.py \
+    input_json:=/root/taller1/trajectories/PAP.json \
+    baseline_output_dir:=/root/taller1/trajectories_baseline/pap_restringido
+
+# COMPARAR
+python3 tools/compare_planned_trajectories.py \
+    --raw        "$(ls -t trajectories_baseline/pap_raw/*.json | head -1)" \
+    --restricted "$(ls -t trajectories_baseline/pap_restringido/*.json | head -1)" \
+    --tuned      trajectories/PAP.json \
+    --label-raw "MoveIt2 Base RAW" --label-restricted "MoveIt2 Base restringido" \
+    --label-tuned "MoveIt2 Afinado" \
+    --output-dir resultados_evolucion_pap/
+```
+
+Cada comparación deja el PNG a 300 dpi, los tres CSV y los metadatos en su
+carpeta.
+
+#### Cómo se distinguen RAW y RESTRINGIDO en el archivo
+
+El JSON generado registra la condición explícitamente:
+
+```json
+"baseline_metadata": { "pipeline_limits_enforced": false }
+```
+
+Sin ese campo, las dos condiciones sólo se distinguirían **contando
+violaciones** de límites — que es justo lo que se quiere medir, y por tanto no
+puede servir de etiqueta.
+
+Para verificar cualquier archivo generado:
+
+```bash
+python3 -c "
+import json,glob
+for p in sorted(glob.glob('trajectories_baseline/**/*.json', recursive=True)):
+    d=json.load(open(p)); m=d.get('baseline_metadata',{})
+    lim=m.get('pipeline_limits_enforced','sin-registrar')
+    print(f\"{p:62s} limites={str(lim):12s} \"
+          f\"vel={d.get('planner_metadata',{}).get('velocity_scaling')} \"
+          f\"estado={m.get('schema_status', d.get('schema_status','?'))}\")
+"
+```
+
+Recorre también la carpeta plana, y los archivos anteriores a este campo
+aparecen como `sin-registrar` en vez de reventar con `KeyError`.
+
+#### Cuatro cosas antes de empezar
+
+**El espacio en `CUADRADO FINAL.json`.** Por eso el `"input_json:=..."` va
+entrecomillado entero. Si `ros2 launch` protestara igual, lanza sin ese
+argumento y pega la ruta a mano en el campo **JSON** del panel DEMOSTRACIÓN de
+la GUI — hace lo mismo.
+
+**Hay que relanzar entre RAW y RESTRINGIDO.** El `joint_limits.yaml` se elige
+al arrancar, no en caliente. No vale con cambiar de botón.
+
+> [!WARNING]
+> **RRTConnect es estocástico.** Cada pulsación da un camino distinto: de las 7
+> realizaciones registradas, 4 salieron con 218 waypoints, 2 con 311 y 1 con
+> 405. Pulsa **3 o 4 veces por condición** y quédate con el rango, o declara en
+> la tesis que es una realización concreta. Lo que no conviene es planificar
+> hasta que salga la que más guste.
+
+**Si el RAW no falla el preflight**, saldrá con nombre `vel5` en vez de `raw`.
+No es un error: significa que esa realización concreta se quedó dentro de
+límites por casualidad. Se distingue por `pipeline_limits_enforced: false`, que
+es lo que define la condición.
+
+> [!NOTE]
+> `PAP.json` es **byte a byte** el mismo archivo que
+> `trajectory_sequence_20260822_193944.json` (md5
+> `004e00cae63b093444a5957dac09a175`). Los números de la comparación ya hecha
+> valen tal cual para PAP; no hace falta rehacerla salvo que se quieran más
+> realizaciones.
+
+---
+
 ## 8. Cómo interpretar el CSV
 
 Un archivo por trayectoria, en `analysis_output/`:

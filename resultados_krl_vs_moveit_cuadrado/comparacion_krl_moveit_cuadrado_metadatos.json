@@ -1,0 +1,116 @@
+{
+  "task": "CUADRADO",
+  "comparison": "Comparacion de la evolucion articular entre la ejecucion KRL registrada y la trayectoria afinada planificada por MoveIt2.",
+  "scope_note": "Solo evolucion y configuracion articular. NO compara tiempo, velocidad, aceleracion, jerk ni frecuencia: esas magnitudes pertenecen al estudio comparativo fisico.",
+  "krl": {
+    "path": "/root/taller1/CSVS/squareKRL1.csv",
+    "data_nature": "ejecucion fisica registrada",
+    "axis_columns": [
+      "axis_actual.A1",
+      "axis_actual.A2",
+      "axis_actual.A3",
+      "axis_actual.A4",
+      "axis_actual.A5",
+      "axis_actual.A6"
+    ],
+    "units": "columnas axis_actual.A1..A6, en GRADOS. El log no publica radianes: no hay verificacion cruzada posible y no se inventa ninguna.",
+    "n_total_samples": 484,
+    "n_used_samples": 484,
+    "sample_criterion": "todas las muestras (no hay criterio de movimiento utilizable)",
+    "motion_column_audit": [
+      "move_executed: presente, pero CONSTANTE (= 'False') en las 484 muestras. No discrimina movimiento.",
+      "move_ready: presente, pero CONSTANTE (= 'False') en las 484 muestras. No discrimina movimiento."
+    ]
+  },
+  "moveit_tuned": {
+    "path": "/root/taller1/trajectories/CUADRADO FINAL.json",
+    "data_nature": "trayectoria planificada por MoveIt2",
+    "units": "positions_rad (radianes) -> convertido a grados; verificacion cruzada contra positions_deg superada",
+    "n_waypoints": 133,
+    "extra": {
+      "md5": "3e5bd66c5aaf7a47f95a525654a5c765",
+      "source": "kuka_gui_control",
+      "generated_at": "2026-08-31T19:37:18",
+      "n_source_points": 10,
+      "n_segments": 9,
+      "n_segments_in_file": 9,
+      "segments_used": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8",
+        "T9"
+      ],
+      "source_point_ids": [
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "P7",
+        "P8",
+        "P9",
+        "P10"
+      ],
+      "gripper_events": 0,
+      "planner_metadata": {
+        "planning_pipeline": "",
+        "planner_id": "",
+        "group": "manipulator",
+        "plan_only": true,
+        "velocity_scaling": 0.1,
+        "acceleration_scaling": 0.1,
+        "planning_attempts": 10,
+        "allowed_planning_time_sec": 10.0,
+        "joint_goal_tolerance_rad": 0.003490658503988659,
+        "segment_chaining": "previous_trajectory_end"
+      },
+      "checks": [
+        "schema_version = 1 (soportada)",
+        "joint_names coinciden con el orden canonico (6)",
+        "source_points: 10, todos con 6 componentes",
+        "segmentos: 9 = source_points - 1 (coherente)",
+        "verificacion cruzada rad/deg: peor caso 0.000e+00 deg (tolerancia 1.0e-09) — SUPERADA",
+        "waypoints totales: 133, todos con 6 componentes",
+        "limites del URDF baseline: 0 violaciones"
+      ]
+    }
+  },
+  "joint_limits_source": "/root/taller1/ros2_ws/src/kuka_kr6_support/urdf/kr6r900sixx_macro.xacro",
+  "joint_limits_deg": {
+    "A1": [
+      -170.0,
+      170.0
+    ],
+    "A2": [
+      -190.0,
+      45.0
+    ],
+    "A3": [
+      -119.99999999999999,
+      156.0
+    ],
+    "A4": [
+      -185.0,
+      185.0
+    ],
+    "A5": [
+      -119.99999999999999,
+      119.99999999999999
+    ],
+    "A6": [
+      -350.0,
+      350.0
+    ]
+  },
+  "outputs": {
+    "png": "/root/taller1/resultados_krl_vs_moveit_cuadrado/comparacion_krl_moveit_cuadrado_articular.png",
+    "summary_csv": "/root/taller1/resultados_krl_vs_moveit_cuadrado/comparacion_krl_moveit_cuadrado_resumen.csv",
+    "detail_csv": "/root/taller1/resultados_krl_vs_moveit_cuadrado/comparacion_krl_moveit_cuadrado_detalle.csv"
+  }
+}
