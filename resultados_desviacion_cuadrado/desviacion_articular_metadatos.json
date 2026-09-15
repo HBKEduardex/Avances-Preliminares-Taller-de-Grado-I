@@ -1,0 +1,38 @@
+{
+  "metric_name": "Desviacion articular entre KRL y MoveIt2 afinado",
+  "task": "CUADRADO",
+  "not_a": "No es error de seguimiento, error temporal, precision del controlador ni error fisico. No se usan marcas de tiempo ni alineamiento temporal.",
+  "error_convention": "error = q_MoveIt2_afinado - q_KRL",
+  "common_grid_points": 1000,
+  "progress_definition": "p(k) = k / (N - 1), en [0, 1], por fuente",
+  "interpolation": "lineal (numpy.interp), sin suavizado",
+  "krl": {
+    "path": "/home/eduardex/Documents/taller1/CSVS/squareKRL1.csv",
+    "data_nature": "ejecucion fisica registrada",
+    "axis_columns": [
+      "axis_actual.A1",
+      "axis_actual.A2",
+      "axis_actual.A3",
+      "axis_actual.A4",
+      "axis_actual.A5",
+      "axis_actual.A6"
+    ],
+    "units": "grados",
+    "n_samples": 484,
+    "n_total_samples": 484,
+    "sample_criterion": "todas las muestras (no hay criterio de movimiento utilizable)",
+    "repeated_samples": 62
+  },
+  "moveit_tuned": {
+    "path": "/home/eduardex/Documents/taller1/trajectories/CUADRADO FINAL.json",
+    "data_nature": "trayectoria planificada por MoveIt2",
+    "units": "positions_rad (radianes) -> convertido a grados; verificacion cruzada contra positions_deg superada",
+    "n_waypoints": 133
+  },
+  "caveat": "El progreso normalizado es fraccion de MUESTRAS, no de tarea. Parte de la desviacion procede del reparto distinto de muestras entre las dos fuentes.",
+  "outputs": {
+    "png": "/home/eduardex/Documents/taller1/resultados_desviacion_cuadrado/desviacion_articular.png",
+    "summary_csv": "/home/eduardex/Documents/taller1/resultados_desviacion_cuadrado/desviacion_articular_resumen.csv",
+    "points_csv": "/home/eduardex/Documents/taller1/resultados_desviacion_cuadrado/desviacion_articular_puntos.csv"
+  }
+}

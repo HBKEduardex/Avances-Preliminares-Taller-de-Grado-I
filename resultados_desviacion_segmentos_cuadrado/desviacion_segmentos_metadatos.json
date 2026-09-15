@@ -1,0 +1,158 @@
+{
+  "metric_name": "Desviacion de la evolucion articular entre KRL y MoveIt2 afinado",
+  "task": "CUADRADO",
+  "execution_date": "2026-09-15T19:16:17",
+  "not_a": "No es error de seguimiento, error temporal, precision del controlador ni error fisico. No se usa DTW, ni ninguna deformacion de las curvas, ni el tiempo como eje.",
+  "error_convention": "error = q_MoveIt2_afinado - q_KRL",
+  "krl": {
+    "path": "/home/eduardex/Documents/taller1/CSVS/squareKRL1.csv",
+    "data_nature": "ejecucion fisica registrada",
+    "axis_columns": [
+      "axis_actual.A1",
+      "axis_actual.A2",
+      "axis_actual.A3",
+      "axis_actual.A4",
+      "axis_actual.A5",
+      "axis_actual.A6"
+    ],
+    "units": "grados",
+    "n_original_samples": 484,
+    "n_stationary_removed": 61,
+    "n_samples_used": 423,
+    "stationary_criterion": "||q(k)-q(k-1)|| <= 0 deg; se conservan siempre la primera y la ultima muestra. Las posiciones no se suavizan."
+  },
+  "moveit_tuned": {
+    "path": "/home/eduardex/Documents/taller1/trajectories/CUADRADO FINAL.json",
+    "data_nature": "trayectoria planificada por MoveIt2",
+    "units": "positions_rad (radianes) -> convertido a grados; verificacion cruzada contra positions_deg superada",
+    "n_waypoints": 133,
+    "n_segments": 9
+  },
+  "segmentation": {
+    "krl_method": "asignacion monotona optima de los puntos enseñados (source_points) sobre el registro, por programacion dinamica. Solo usa KRL y los puntos enseñados: nunca la curva de MoveIt2.",
+    "moveit_method": "estructura segments[] del JSON, directamente.",
+    "match_tolerance_deg": 0.5,
+    "max_residual_deg": 0.0012590468617076124,
+    "residuals_deg": [
+      0.0,
+      0.0012590468617076124,
+      1.3304134686627885e-05,
+      0.0,
+      0.0,
+      0.0,
+      1.000000000001e-06,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "map": [
+      {
+        "segmento_comparado": "T1",
+        "inicio_KRL": 0,
+        "fin_KRL": 50,
+        "segmento_MoveIt2": "T1",
+        "descripcion": "P1 -> P2",
+        "n_muestras_KRL": 51,
+        "n_puntos_MoveIt2": 31,
+        "residuo_inicio_deg": 0.0,
+        "residuo_fin_deg": 0.0012590468617076124
+      },
+      {
+        "segmento_comparado": "T2",
+        "inicio_KRL": 50,
+        "fin_KRL": 74,
+        "segmento_MoveIt2": "T2",
+        "descripcion": "P2 -> P3",
+        "n_muestras_KRL": 25,
+        "n_puntos_MoveIt2": 19,
+        "residuo_inicio_deg": 0.0012590468617076124,
+        "residuo_fin_deg": 1.3304134686627885e-05
+      },
+      {
+        "segmento_comparado": "T3",
+        "inicio_KRL": 74,
+        "fin_KRL": 110,
+        "segmento_MoveIt2": "T3",
+        "descripcion": "P3 -> P4",
+        "n_muestras_KRL": 37,
+        "n_puntos_MoveIt2": 9,
+        "residuo_inicio_deg": 1.3304134686627885e-05,
+        "residuo_fin_deg": 0.0
+      },
+      {
+        "segmento_comparado": "T4",
+        "inicio_KRL": 110,
+        "fin_KRL": 167,
+        "segmento_MoveIt2": "T4",
+        "descripcion": "P4 -> P5",
+        "n_muestras_KRL": 58,
+        "n_puntos_MoveIt2": 12,
+        "residuo_inicio_deg": 0.0,
+        "residuo_fin_deg": 0.0
+      },
+      {
+        "segmento_comparado": "T5",
+        "inicio_KRL": 167,
+        "fin_KRL": 226,
+        "segmento_MoveIt2": "T5",
+        "descripcion": "P5 -> P6",
+        "n_muestras_KRL": 60,
+        "n_puntos_MoveIt2": 10,
+        "residuo_inicio_deg": 0.0,
+        "residuo_fin_deg": 0.0
+      },
+      {
+        "segmento_comparado": "T6",
+        "inicio_KRL": 226,
+        "fin_KRL": 283,
+        "segmento_MoveIt2": "T6",
+        "descripcion": "P6 -> P7",
+        "n_muestras_KRL": 58,
+        "n_puntos_MoveIt2": 12,
+        "residuo_inicio_deg": 0.0,
+        "residuo_fin_deg": 1.000000000001e-06
+      },
+      {
+        "segmento_comparado": "T7",
+        "inicio_KRL": 283,
+        "fin_KRL": 341,
+        "segmento_MoveIt2": "T7",
+        "descripcion": "P7 -> P8",
+        "n_muestras_KRL": 59,
+        "n_puntos_MoveIt2": 10,
+        "residuo_inicio_deg": 1.000000000001e-06,
+        "residuo_fin_deg": 0.0
+      },
+      {
+        "segmento_comparado": "T8",
+        "inicio_KRL": 341,
+        "fin_KRL": 379,
+        "segmento_MoveIt2": "T8",
+        "descripcion": "P8 -> P9",
+        "n_muestras_KRL": 39,
+        "n_puntos_MoveIt2": 9,
+        "residuo_inicio_deg": 0.0,
+        "residuo_fin_deg": 0.0
+      },
+      {
+        "segmento_comparado": "T9",
+        "inicio_KRL": 379,
+        "fin_KRL": 421,
+        "segmento_MoveIt2": "T9",
+        "descripcion": "P9 -> P10",
+        "n_muestras_KRL": 43,
+        "n_puntos_MoveIt2": 21,
+        "residuo_inicio_deg": 0.0,
+        "residuo_fin_deg": 0.0
+      }
+    ]
+  },
+  "progress_definition": "s(k) = s(k-1) + ||q(k)-q(k-1)||;  p = s / s(final), por segmento y por fuente, independientemente.",
+  "interpolation_points_per_segment": 200,
+  "outputs": {
+    "segments_csv": "/home/eduardex/Documents/taller1/resultados_desviacion_segmentos_cuadrado/desviacion_segmentos.csv",
+    "global_csv": "/home/eduardex/Documents/taller1/resultados_desviacion_segmentos_cuadrado/desviacion_global.csv",
+    "evolution_png": "/home/eduardex/Documents/taller1/resultados_desviacion_segmentos_cuadrado/desviacion_segmentos.png",
+    "error_png": "/home/eduardex/Documents/taller1/resultados_desviacion_segmentos_cuadrado/error_segmentos.png"
+  }
+}
